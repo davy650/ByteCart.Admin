@@ -1,0 +1,11 @@
+/home/david/David/Learning/Blazor/ByteCart.Admin/ByteCart.Admin.Domain/bin/Debug/net9.0/ByteCart.Admin.Domain.deps.json
+/home/david/David/Learning/Blazor/ByteCart.Admin/ByteCart.Admin.Domain/bin/Debug/net9.0/ByteCart.Admin.Domain.dll
+/home/david/David/Learning/Blazor/ByteCart.Admin/ByteCart.Admin.Domain/bin/Debug/net9.0/ByteCart.Admin.Domain.pdb
+/home/david/David/Learning/Blazor/ByteCart.Admin/ByteCart.Admin.Domain/obj/Debug/net9.0/ByteCart.Admin.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/david/David/Learning/Blazor/ByteCart.Admin/ByteCart.Admin.Domain/obj/Debug/net9.0/ByteCart.Admin.Domain.AssemblyInfoInputs.cache
+/home/david/David/Learning/Blazor/ByteCart.Admin/ByteCart.Admin.Domain/obj/Debug/net9.0/ByteCart.Admin.Domain.AssemblyInfo.cs
+/home/david/David/Learning/Blazor/ByteCart.Admin/ByteCart.Admin.Domain/obj/Debug/net9.0/ByteCart.Admin.Domain.csproj.CoreCompileInputs.cache
+/home/david/David/Learning/Blazor/ByteCart.Admin/ByteCart.Admin.Domain/obj/Debug/net9.0/ByteCart.Admin.Domain.dll
+/home/david/David/Learning/Blazor/ByteCart.Admin/ByteCart.Admin.Domain/obj/Debug/net9.0/refint/ByteCart.Admin.Domain.dll
+/home/david/David/Learning/Blazor/ByteCart.Admin/ByteCart.Admin.Domain/obj/Debug/net9.0/ByteCart.Admin.Domain.pdb
+/home/david/David/Learning/Blazor/ByteCart.Admin/ByteCart.Admin.Domain/obj/Debug/net9.0/ref/ByteCart.Admin.Domain.dll
