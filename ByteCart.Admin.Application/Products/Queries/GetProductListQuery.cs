@@ -20,25 +20,4 @@ namespace ByteCart.Admin.Application.Products.Queries
         public ProductStatus? Status { get; set; }
 
     }
-
-    // // Handler
-    // public class GetProductListQueryHandler : IRequestHandler<GetProductListQuery, List<ProductDto>>
-    // {
-    //     // Inject your data source, e.g., DbContext or repository
-    //     public GetProductListQueryHandler(/* Inject dependencies here */)
-    //     {
-    //     }
-
-    //     public async Task<List<ProductDto>> Handle(GetProductListQuery request, CancellationToken cancellationToken)
-    //     {
-    //         // Replace with actual data fetching logic
-    //         var products = new List<ProductDto>
-    //         {
-    //             new ProductDto { Id = 1, Name = "Product 1" },
-    //             new ProductDto { Id = 2, Name = "Product 2" }
-    //         };
-
-    //         return await Task.FromResult(products);
-    //     }
-    // }
 }
