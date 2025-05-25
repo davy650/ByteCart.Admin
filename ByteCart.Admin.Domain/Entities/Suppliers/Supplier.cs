@@ -1,8 +1,9 @@
+using ByteCart.Admin.Domain.Common;
 using ByteCart.Admin.Domain.Entities.Products;
 
 namespace ByteCart.Admin.Domain.Entities.Suppliers
 {
-    internal class Supplier
+    public class Supplier : Auditable
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -10,6 +11,6 @@ namespace ByteCart.Admin.Domain.Entities.Suppliers
         public string? ContactNumber { get; set; }
         public string? Website { get; set; }
 
-        internal ICollection<Product> Products { get; set; } = new List<Product>();
+        public ICollection<Product> Products { get; set; } = new List<Product>();
     }
 }

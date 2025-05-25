@@ -1,6 +1,6 @@
 namespace ByteCart.Admin.Domain.Enum
 {
-    internal enum ProductStatus
+    public enum ProductStatus
     {
         Draft,
         Pending,

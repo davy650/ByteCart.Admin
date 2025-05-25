@@ -1,6 +1,6 @@
 namespace ByteCart.Admin.Domain.Entities.Products
 {
-    internal class ProductTag
+    public class ProductTag
     {
         public Guid ProductId { get; set; }
         public Product Product { get; set; } = null!;

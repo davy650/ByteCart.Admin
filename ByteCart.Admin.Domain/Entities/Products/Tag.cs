@@ -1,6 +1,6 @@
 namespace ByteCart.Admin.Domain.Entities.Products
 {
-    internal class Tag
+    public class Tag
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;

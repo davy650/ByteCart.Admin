@@ -1,6 +1,6 @@
 namespace ByteCart.Admin.Domain.Common
 {
-    internal abstract class Auditable
+    public abstract class Auditable
     {
         public DateTime CreatedAt { get; set; }
         public string? CreatedBy { get; set; }

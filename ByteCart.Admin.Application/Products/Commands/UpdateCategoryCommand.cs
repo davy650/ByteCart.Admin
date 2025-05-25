@@ -1,6 +1,8 @@
+using MediatR;
+
 namespace ByteCart.Admin.Application.Products.Commands
 {
-    public record UpdateCategoryCommand
+    public record UpdateCategoryCommand : IRequest<bool>
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;

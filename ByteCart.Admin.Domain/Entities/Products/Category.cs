@@ -4,7 +4,7 @@ using ByteCart.Admin.Domain.Common;
 
 namespace ByteCart.Admin.Domain.Entities.Products
 {
-    internal class Category : Auditable
+    public class Category : Auditable
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
