@@ -12,6 +12,8 @@ namespace ByteCart.Admin.Domain.Entities.Products
 
         // cater for nested categories
         public Guid? ParentCategoryId { get; set; }
-        public IEnumerable<string> SubCategories { get; set; } = new List<string>();
+        public Category? ParentCategory { get; set; }
+        public ICollection<Category> SubCategories { get; set; } = new List<Category>();
+        public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
     }
 }
