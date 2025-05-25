@@ -1,0 +1,27 @@
+@page "/products/create"
+
+@inject IMediator Mediator
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+@rendermode InteractiveServer
+
+<h3>Create Product</h3>
+
+<EditForm Model="@createProductCommand" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+</EditForm>
+
+@code {
+	private CreateProductCommand createProductCommand { get; set; } = new CreateProductCommand();
+
+	private async Task HandleValidSubmit()
+	{
+		// TODO: Add logic to handle valid form submission
+	}
+
+	private void HandleInvalidSubmit()
+	{
+		// TODO: Add logic to handle invalid form submission
+	}
+}
+

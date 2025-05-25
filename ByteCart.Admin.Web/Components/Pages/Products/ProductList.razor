@@ -1,6 +1,5 @@
 @page "/products"
-@using ByteCart.Admin.Application.Common
-@using ByteCart.Admin.Application.DTOs
+
 @inject IMediator Mediator
 @inject IJSRuntime JSRuntime
 
@@ -18,7 +17,7 @@
         }
     </select>
 
-    <select @bind="selectedSupplierId" class="form-select mb-3">
+    <select @bind="selectedSupplierId" class="form-select">
         <option value="">All Suppliers</option>
         @foreach (var supplier in Suppliers)
         {
@@ -112,9 +111,6 @@ else
 <a href="/products/create" class="btn btn-success">Add New Product</a>
 
 @code {
-
-    // TODO: implement logic to load categories
-    // TODO: implement logic to load suppliers
     private List<CategoryDto> Categories = new();
     private List<SupplierDto> Suppliers = new();
     private PaginatedList<ProductDto>? PaginatedProductsList;
@@ -135,7 +131,9 @@ else
     protected override async Task OnInitializedAsync()
     {
         // Load initial data
+        await LoadCategories();
         await LoadProducts();
+        await LoadSuppliers();
     }
 
     private async Task ApplyFilters()
@@ -190,5 +188,17 @@ else
             // TODO: implement logic to delete product
         }
         await LoadProducts();
+    }
+
+    private async Task LoadCategories()
+    {   
+        var categoriesQuery = new GetCategoryListQueryCommand();
+        Categories = await Mediator.Send(categoriesQuery);
+    }
+
+    private async Task LoadSuppliers()
+    {
+        var suppliersQuery = new GetSupplierListQueryCommand();
+        Suppliers = await Mediator.Send(suppliersQuery);
     }
 }
