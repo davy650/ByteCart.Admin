@@ -1,38 +1,42 @@
 using System.Threading;
 using System.Threading.Tasks;
+using ByteCart.Admin.Application.Commands.Products;
 using ByteCart.Admin.Application.Interfaces;
-using ByteCart.Admin.Application.Products.Commands;
 using ByteCart.Admin.Domain.Entities.Products;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
-namespace ByteCart.Admin.Application.Products.Handlers
+namespace ByteCart.Admin.Application.Handlers.Products
 {
-    public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Guid>
+    public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, bool>
     {
         private readonly IApplicationDbContext _context;
-        public CreateProductCommandHandler(IApplicationDbContext context)
+        public UpdateProductCommandHandler(IApplicationDbContext context)
         {
             _context = context;
         }
 
-        public async Task<Guid> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
-            var product = new Product
+
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
+            if (product == null)
             {
-                Id = Guid.NewGuid(),
-                Name = request.Name,
-                SKU = request.SKU,
-                Description = request.Description,
-                Price = request.Price,
-                CostPrice = request.CostPrice,
-                StockQuantity = request.StockQuantity,
-                Status = request.Status,
-                LaunchDate = request.LaunchDate,
-                EndDate = request.EndDate,
-                SupplierId = request.SupplierId,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = request.CreatedBy
-            };
+                return false;
+            }
+
+            product.Name = request.Name;
+            product.SKU = request.SKU;
+            product.Description = request.Description;
+            product.Price = request.Price;
+            product.CostPrice = request.CostPrice;
+            product.StockQuantity = request.StockQuantity;
+            product.Status = request.Status;
+            product.LaunchDate = request.LaunchDate;
+            product.EndDate = request.EndDate;
+            product.SupplierId = request.SupplierId;
+            product.ModifiedAt = DateTime.UtcNow;
+            product.ModifiedBy = request.ModifiedBy;
 
             // tags
             foreach (var tag in request.Tags)
@@ -60,9 +64,9 @@ namespace ByteCart.Admin.Application.Products.Handlers
                 _context.Tags.Add(tag);
             }
 
-            _context.Products.Add(product);
+            _context.Products.Update(product);
             await _context.SaveChangesAsync(cancellationToken);
-            return product.Id;
+            return true;
         }
     }
 }

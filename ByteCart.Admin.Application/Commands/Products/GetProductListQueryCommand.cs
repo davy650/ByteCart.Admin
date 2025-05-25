@@ -1,14 +1,14 @@
-using ByteCart.Admin.Application.Products.DTOs;
-using ByteCart.Admin.Application.Products.Queries.Common;
+using ByteCart.Admin.Application.Common;
+using ByteCart.Admin.Application.DTOs;
 using ByteCart.Admin.Domain.Enum;
 using MediatR;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ByteCart.Admin.Application.Products.Queries
+namespace ByteCart.Admin.Application.Commands.Products
 {
-    public class GetProductListQuery : IRequest<PaginatedList<ProductDto>>
+    public class GetProductListQueryCommand : IRequest<PaginatedList<ProductDto>>
     {
         public string? SearchTerm { get; set; }
         public int PageNumber { get; set; } = 1;

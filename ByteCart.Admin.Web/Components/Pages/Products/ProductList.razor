@@ -1,6 +1,6 @@
 @page "/products"
-@using ByteCart.Admin.Application.Products.DTOs
-@using ByteCart.Admin.Application.Products.Queries.Common
+@using ByteCart.Admin.Application.Common
+@using ByteCart.Admin.Application.DTOs
 @inject IMediator Mediator
 @inject IJSRuntime JSRuntime
 
@@ -146,7 +146,7 @@ else
 
     private async Task LoadProducts()
     {
-        var query = new GetProductListQuery
+        var query = new GetProductListQueryCommand
         {
             SearchTerm = searchTerm,
             PageNumber = CurrentPage,

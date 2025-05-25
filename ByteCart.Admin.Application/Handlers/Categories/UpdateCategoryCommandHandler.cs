@@ -1,6 +1,5 @@
+using ByteCart.Admin.Application.Commands.Categories;
 using ByteCart.Admin.Application.Interfaces;
-using ByteCart.Admin.Application.Products.Commands;
-using ByteCart.Admin.Domain.Entities.Products;
 using MediatR;
 
 public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, bool>

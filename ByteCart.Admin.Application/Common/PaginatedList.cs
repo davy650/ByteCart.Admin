@@ -1,4 +1,4 @@
-namespace ByteCart.Admin.Application.Products.Queries.Common
+namespace ByteCart.Admin.Application.Common
 {
     public class PaginatedList<T>
     {

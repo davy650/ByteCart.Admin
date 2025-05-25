@@ -1,7 +1,7 @@
 using MediatR;
 using ByteCart.Admin.Domain.Enum;
 
-namespace ByteCart.Admin.Application.Products.Commands
+namespace ByteCart.Admin.Application.Commands.Products
 {
     public record UpdateProductCommand : IRequest<bool>
     {

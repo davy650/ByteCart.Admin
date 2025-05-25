@@ -1,7 +1,7 @@
 using ByteCart.Admin.Domain.Enum;
 using MediatR;
 
-namespace ByteCart.Admin.Application.Products.Commands
+namespace ByteCart.Admin.Application.Commands.Products
 {
     public record CreateProductCommand : IRequest<Guid>
     {

@@ -1,4 +1,4 @@
-namespace ByteCart.Admin.Application.Products.DTOs
+namespace ByteCart.Admin.Application.DTOs
 {
     public class SupplierDto
     {

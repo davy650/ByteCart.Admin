@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace ByteCart.Admin.Application.Products.Commands
+namespace ByteCart.Admin.Application.Commands.Categories
 {
     public class DeleteCategoryCommand : IRequest<bool>
     {

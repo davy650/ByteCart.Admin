@@ -1,6 +1,6 @@
 using ByteCart.Admin.Domain.Enum;
 
-namespace ByteCart.Admin.Application.Products.DTOs
+namespace ByteCart.Admin.Application.DTOs
 {
     public class ProductDto
     {
