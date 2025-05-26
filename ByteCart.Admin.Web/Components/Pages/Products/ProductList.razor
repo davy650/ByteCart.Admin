@@ -185,7 +185,8 @@ else
         bool confirmDelete = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this product?");  
         if (confirmDelete) 
         {
-            // TODO: implement logic to delete product
+            var deleteCommand = new DeleteProductCommand { ProductId = productId };
+            await Mediator.Send(deleteCommand);
         }
         await LoadProducts();
     }

@@ -4,6 +4,6 @@ namespace ByteCart.Admin.Application.Commands.Products
 {
     public class DeleteProductCommand : IRequest<bool>
     {
-        public Guid ProductId { get; }
+        public Guid ProductId { get; set; }
     }
 }
