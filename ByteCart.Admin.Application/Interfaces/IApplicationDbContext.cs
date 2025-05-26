@@ -18,6 +18,5 @@ namespace ByteCart.Admin.Application.Interfaces
         DbSet<Image> Images { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
-        object Set<T>();
     }
 }

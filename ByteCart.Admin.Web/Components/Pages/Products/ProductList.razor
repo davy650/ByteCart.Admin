@@ -74,7 +74,7 @@ else
             @foreach (var product in Products)
             {
                 <tr>
-                    <td>@product.Name</td>
+                    <td><a href="/products/details/@product.Id">@product.Name</a></td>
                     <td>@product.Price.ToString("C")</td>
                     <td>@product.SKU</td>
                     <td>@product.SupplierId</td>
