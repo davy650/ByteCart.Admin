@@ -19,7 +19,7 @@ namespace ByteCart.Admin.Application.Queries.Products
         {
             IQueryable<Product> query = _context.Products
                 .Include(p => p.ProductCategories)
-                .ThenInclude(pc => pc.CategoryId)
+                .ThenInclude(pc => pc.Category)
                 .Include(p => p.ProductTags)
                 .ThenInclude(pt => pt.Tag)
                 .Include(p => p.Images)

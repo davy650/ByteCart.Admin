@@ -60,8 +60,12 @@ namespace ByteCart.Admin.Application.Queries.Products
             query = request.SortBy switch
             {
                 "name" => query.OrderBy(p => p.Name),
-                "price" => query.OrderBy(p => p.Price),
-                "createdAt" => query.OrderByDescending(p => p.CreatedAt),
+                "PriceAsc" => query.OrderBy(p => p.Price),
+                "PriceDesc" => query.OrderByDescending(p => p.Price),
+                "DateCreatedAsc" => query.OrderBy(p => p.CreatedAt),
+                "DateCreatedDesc" => query.OrderByDescending(p => p.CreatedAt),
+                "StockAsc" => query.OrderBy(p => p.StockQuantity),
+                "StockDesc" => query.OrderByDescending(p => p.StockQuantity),
                 _ => query.OrderByDescending(p => p.CreatedAt)
             };
 

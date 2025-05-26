@@ -76,7 +76,7 @@
             <div class="form-check">
                 @foreach (var category in Categories)
                 {
-                    <input type="checkbox" id="category_@category.Id" @onchange="(e) => ToggleCategory(category.Id, (bool)e.Value)"
+                    <input type="checkbox" id="category_@category.Id" @onchange="(e) => ToggleCategory(category.Id, e.Value is bool b && b)"
                         checked="@createProductCommand.Categories.Contains(category.Id)" />
                     <label for="category_@category.Id">@category.Name</label><br />
                 }
@@ -131,13 +131,20 @@
 	private CreateProductCommand createProductCommand = new();
     private List<SupplierDto> Suppliers = new();
     private List<CategoryDto> Categories = new();
-    private List<TagDto> ExistingTags = new(); // TODO: Load existing tags from the database
+    private List<TagDto> ExistingTags = new(); 
     private string NewTagInput = string.Empty;
 
     protected override async Task OnInitializedAsync() 
     {
         await LoadSuppliers();
         await LoadCategories();
+        await LoadExistingTags();
+    }
+
+    private async Task LoadExistingTags()
+    {
+        var tagsQuery = new GetTagListQueryCommand();
+        ExistingTags = await Mediator.Send(tagsQuery);
     }
 
     private async Task LoadSuppliers()
@@ -152,14 +159,9 @@
         Categories = await Mediator.Send(categoriesQuery);
     }
 
-	private async Task HandleValidSubmit()
+	private void HandleInvalidSubmit()
 	{
-		// TODO: Add logic to handle valid form submission
-	}
-
-	private async Task HandleInvalidSubmit()
-	{
-		// TODO: Add logic to handle invalid form submission
+		Console.WriteLine("Invalid submission.");
 	}
 
 
@@ -169,12 +171,12 @@
         {
             if (!createProductCommand.Categories.Contains(categoryId))
             {
-                createProductCommand.Categories = createProductCommand.Categories.Append(categoryId).ToList();
+                createProductCommand.Categories.Add(categoryId);
             }
         }
         else
         {
-            createProductCommand.Categories = createProductCommand.Categories.Where(id => id != categoryId).ToList();
+            createProductCommand.Categories.Remove(categoryId);
         }
     }
 
@@ -191,16 +193,16 @@
                 var existingTag = ExistingTags.FirstOrDefault(t => t.Name.Equals(tag, StringComparison.OrdinalIgnoreCase));
                 if (existingTag != null)
                 {
-                    if (!ProductCommand.TagIds.Contains(existingTag.Id))
+                    if (!createProductCommand.Tags.Contains(existingTag.Id))
                     {
-                        ProductCommand.TagIds.Add(existingTag.Id);
+                        createProductCommand.Tags.Add(existingTag.Id);
                     }
                 }
                 else // It's a new tag
                 {
-                    if (!ProductCommand.NewTagNames.Contains(tag, StringComparer.OrdinalIgnoreCase))
+                    if (!createProductCommand.NewTagNames.Contains(tag, StringComparer.OrdinalIgnoreCase))
                     {
-                        ProductCommand.NewTagNames.Add(tag);
+                        createProductCommand.NewTagNames.Add(tag);
                     }
                 }
             }
@@ -212,20 +214,36 @@
     {
         if (isNew && tagIdentifier is string tagName)
         {
-            ProductCommand.NewTagNames.Remove(tagName);
+            createProductCommand.NewTagNames.Remove(tagName);
         }
         else if (!isNew && tagIdentifier is Guid tagId)
         {
-            ProductCommand.TagIds.Remove(tagId);
+            createProductCommand.Tags.Remove(tagId);
         }
     }
 
     private void AddExistingTag(Guid tagId)
     {
-        if (!ProductCommand.TagIds.Contains(tagId))
+        if (!createProductCommand.Tags.Contains(tagId))
         {
-            ProductCommand.TagIds.Add(tagId);
+            createProductCommand.Tags.Add(tagId);
         }
     }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var productId = await Mediator.Send(createProductCommand);
+            NavigationManager.NavigateTo($"/products/details/{productId}"); // Redirect to product details or list
+        }
+        catch (Exception ex)
+        {
+            // General error handling
+            Console.WriteLine($"Error creating product: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error creating product: {ex.Message}");
+        }
+    }
+
 }
 

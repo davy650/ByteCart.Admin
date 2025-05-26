@@ -25,11 +25,13 @@ namespace ByteCart.Admin.Application.Handlers.Products
                 CostPrice = request.CostPrice,
                 StockQuantity = request.StockQuantity,
                 Status = request.Status,
-                LaunchDate = request.LaunchDate,
-                EndDate = request.EndDate,
+                LaunchDate = DateTime.SpecifyKind(request.LaunchDate, DateTimeKind.Utc),
+                EndDate = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Utc),
                 SupplierId = request.SupplierId,
                 CreatedAt = DateTime.UtcNow,
-                CreatedBy = request.CreatedBy
+                CreatedBy = request.CreatedBy,
+                ModifiedAt = DateTime.UtcNow,
+                ModifiedBy = request.CreatedBy
             };
 
             // tags

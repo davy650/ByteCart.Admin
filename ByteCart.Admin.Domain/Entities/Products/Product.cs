@@ -15,7 +15,7 @@ namespace ByteCart.Admin.Domain.Entities.Products
         public int StockQuantity { get; set; }
         public ProductStatus Status { get; set; }
         public DateTime LaunchDate { get; set; }
-        public DateTime? EndDate { get; set; }
+        public DateTime EndDate { get; set; }
         public Guid SupplierId { get; set; }
         public Supplier Supplier { get; set; } = default!;
 
