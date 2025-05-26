@@ -82,8 +82,17 @@ else
             try
             {
                 //await Mediator.Send(new ByteCartAdmin.Application.Features.Suppliers.Commands.DeleteSupplier.DeleteSupplierCommand { Id = supplierId });
-                await JSRuntime.InvokeVoidAsync("alert", "Supplier deleted successfully!");
-                await LoadSuppliers(); // Reload the list
+                var deleteCommand = new DeleteSupplierCommand { Id = supplierId };
+                var result = await Mediator.Send(deleteCommand);
+                if (!result)
+                {
+                    await JSRuntime.InvokeVoidAsync("alert", "Failed to delete supplier!");
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("alert", "Supplier deleted successfully!");
+                }
+                await LoadSuppliers();
             }
             catch (ApplicationException ex)
             {

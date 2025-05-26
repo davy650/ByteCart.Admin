@@ -1,0 +1,99 @@
+@page "/suppliers/details/{SupplierId:guid}"
+@inject IMediator Mediator
+@inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
+
+@rendermode InteractiveServer
+
+<h3>Supplier Details</h3>
+
+@if (supplier == null)
+{
+    <p><em>Loading ...</em></p>
+}
+else
+{
+    <div class="card">
+        <div class="card-header">
+            <h4>@supplier.Name</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">@supplier.Name</dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@supplier.ContactEmail</dd>
+
+                <dt class="col-sm-3">Phone Number</dt>
+                <dd class="col-sm-9">@supplier.ContactNumber</dd>
+
+                <dt class="col-sm-3">Website</dt>
+                <dd class="col-sm-9">@supplier.Website</dd>
+
+                <dt class="col-sm-3">No Of Products</dt>
+                <dd class="col-sm-9">@supplier.ProductCount</dd>
+            </dl>
+        </div>
+        <div class="card-footer">
+            <a href="/suppliers/edit/@SupplierId" class="btn btn-primary me-2">Edit Supplier</a>
+            <button @onclick="HandleDeleteSupplier" class="btn btn-danger me-2">Delete Supplier</button>
+            <a href="/suppliers" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid SupplierId { get; set; }
+
+    private SupplierDto? supplier;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (SupplierId != Guid.Empty)
+        {
+            try
+            {
+                var query = new GetSupplierByIdQueryCommand { Id = SupplierId };
+                supplier = await Mediator.Send(query);
+            }
+            catch (ApplicationException ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+                NavManager.NavigateTo("/suppliers", forceLoad: true); // Redirect if not found
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                await JSRuntime.InvokeVoidAsync("alert", $"An unexpected error occurred: {ex.Message}");
+            }
+        }
+    }
+
+    private async Task HandleDeleteSupplier()
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this supplier? This action cannot be undone.");
+        if (confirmed)
+        {
+            try
+            {
+                var DeleteSupplierCommand = new DeleteSupplierCommand { Id = SupplierId };
+                await Mediator.Send(DeleteSupplierCommand);
+                await JSRuntime.InvokeVoidAsync("alert", "Supplier deleted successfully!");
+                NavManager.NavigateTo("/suppliers"); // Redirect to list after deletion
+            }
+            catch (ApplicationException ex)
+            {
+                // Business rule violation (e.g., supplier has products)
+                await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting supplier: {ex.Message}");
+                await JSRuntime.InvokeVoidAsync("alert", $"An unexpected error occurred during deletion: {ex.Message}");
+            }
+        }
+    }
+}
