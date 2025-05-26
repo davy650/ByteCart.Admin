@@ -9,19 +9,223 @@
 <h3>Create Product</h3>
 
 <EditForm Model="@createProductCommand" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="name">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="createProductCommand.Name" />
+        <ValidationMessage For="@(() => createProductCommand.Name)" />
+    </div>
+
+    <div class="form-group">
+        <label for="SKU">SKU</label>
+        <InputTextArea id="SKU" class="form-control" @bind-Value="createProductCommand.SKU" />
+        <ValidationMessage For="@(() => createProductCommand.SKU)" />
+    </div>
+
+    <div class="form-group">
+        <label for="description">Description</label>
+        <InputTextArea id="description" class="form-control" @bind-Value="createProductCommand.Description" />
+        <ValidationMessage For="@(() => createProductCommand.Description)" />
+    </div>
+
+    <div class="form-group">
+        <label for="price">Price</label>
+        <InputNumber id="price" class="form-control" @bind-Value="createProductCommand.Price" />
+        <ValidationMessage For="@(() => createProductCommand.Price)" />
+    </div>
+
+    <div class="form-group">
+        <label for="costPrice">CostPrice</label>
+        <InputNumber id="costPrice" class="form-control" @bind-Value="createProductCommand.CostPrice" />
+        <ValidationMessage For="@(() => createProductCommand.CostPrice)" />
+    </div>
+
+    <div class="form-group">
+        <label for="stockQuantity">StockQuantity</label>
+        <InputNumber id="stockQuantity" class="form-control" @bind-Value="createProductCommand.StockQuantity" />
+        <ValidationMessage For="@(() => createProductCommand.StockQuantity)" />
+    </div>
+
+      <div class="form-group">
+        <label for="status">Status:</label>
+        <InputSelect id="status" @bind-Value="createProductCommand.Status" class="form-control">
+            @foreach (var status in Enum.GetValues(typeof(ProductStatus)))
+            {
+                <option value="@status">@status</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label for="supplier">Supplier:</label>
+        <InputSelect @bind-Value="createProductCommand.SupplierId" id="supplier" class="form-control">
+            <option value="">Select Supplier</option>
+            @foreach (var supplier in Suppliers)
+            {
+                <option value="@supplier.Id">@supplier.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label>Categories:</label>
+        @if (Categories.Any())
+        {
+            <div class="form-check">
+                @foreach (var category in Categories)
+                {
+                    <input type="checkbox" id="category_@category.Id" @onchange="(e) => ToggleCategory(category.Id, (bool)e.Value)"
+                        checked="@createProductCommand.Categories.Contains(category.Id)" />
+                    <label for="category_@category.Id">@category.Name</label><br />
+                }
+            </div>
+        }
+        else
+        {
+            <p>Please add Categories to proceed</p>
+        }
+    </div>
+
+    <div class="form-group">
+        <label>Tags:</label>
+        <input type="text" @bind-value="NewTagInput" placeholder="Add new tags (comma-separated)" @onkeydown="HandleTagInputKeyDown" class="form-control" />
+        <div class="mt-2">
+            @foreach (var tagId in createProductCommand.Tags)
+            {
+                var tagName = ExistingTags.FirstOrDefault(t => t.Id == tagId)?.Name;
+                if (tagName != null)
+                {
+                    <span class="badge bg-info me-1">@tagName <button type="button" class="btn-close ms-1" @onclick="() => RemoveTag(tagId, isNew: false)"></button></span>
+                }
+            }
+            @foreach (var newTagName in createProductCommand.NewTagNames)
+            {
+                <span class="badge bg-primary me-1">@newTagName <button type="button" class="btn-close ms-1" @onclick="() => RemoveTag(newTagName, isNew: true)"></button></span>
+            }
+        </div>
+        <p class="text-muted"><small>Existing tags:</small>
+        @foreach (var tag in ExistingTags.Where(t => !createProductCommand.Tags.Contains(t.Id)))
+        {
+            <button type="button" class="btn btn-sm btn-outline-secondary m-1" @onclick="() => AddExistingTag(tag.Id)">@tag.Name</button>
+        }
+        </p>
+    </div>
+
+    <div class="form-group">
+        <label for="launchDate">Launch Date:</label>
+        <InputDate id="launchDate" @bind-Value="createProductCommand.LaunchDate" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="endDate">End Date:</label>
+        <InputDate id="endDate" @bind-Value="createProductCommand.EndDate" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Add Product</button>
+    <a href="/products" class="btn btn-secondary mt-3">Cancel</a>
 </EditForm>
 
 @code {
-	private CreateProductCommand createProductCommand { get; set; } = new CreateProductCommand();
+	private CreateProductCommand createProductCommand = new();
+    private List<SupplierDto> Suppliers = new();
+    private List<CategoryDto> Categories = new();
+    private List<TagDto> ExistingTags = new(); // TODO: Load existing tags from the database
+    private string NewTagInput = string.Empty;
+
+    protected override async Task OnInitializedAsync() 
+    {
+        await LoadSuppliers();
+        await LoadCategories();
+    }
+
+    private async Task LoadSuppliers()
+    {
+        var suppliersQuery = new GetSupplierListQueryCommand();
+        Suppliers = await Mediator.Send(suppliersQuery);
+    }
+
+    private async Task LoadCategories()
+    {
+        var categoriesQuery = new GetCategoryListQueryCommand();
+        Categories = await Mediator.Send(categoriesQuery);
+    }
 
 	private async Task HandleValidSubmit()
 	{
 		// TODO: Add logic to handle valid form submission
 	}
 
-	private void HandleInvalidSubmit()
+	private async Task HandleInvalidSubmit()
 	{
 		// TODO: Add logic to handle invalid form submission
 	}
+
+
+    private void ToggleCategory(Guid categoryId, bool isChecked)
+    {
+        if (isChecked)
+        {
+            if (!createProductCommand.Categories.Contains(categoryId))
+            {
+                createProductCommand.Categories = createProductCommand.Categories.Append(categoryId).ToList();
+            }
+        }
+        else
+        {
+            createProductCommand.Categories = createProductCommand.Categories.Where(id => id != categoryId).ToList();
+        }
+    }
+
+    private void HandleTagInputKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" || e.Key == "," && !string.IsNullOrWhiteSpace(NewTagInput))
+        {
+            var tags = NewTagInput.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            foreach (var tag in tags)
+            {
+                if (string.IsNullOrWhiteSpace(tag)) continue;
+
+                // Check if it's an existing tag first
+                var existingTag = ExistingTags.FirstOrDefault(t => t.Name.Equals(tag, StringComparison.OrdinalIgnoreCase));
+                if (existingTag != null)
+                {
+                    if (!ProductCommand.TagIds.Contains(existingTag.Id))
+                    {
+                        ProductCommand.TagIds.Add(existingTag.Id);
+                    }
+                }
+                else // It's a new tag
+                {
+                    if (!ProductCommand.NewTagNames.Contains(tag, StringComparer.OrdinalIgnoreCase))
+                    {
+                        ProductCommand.NewTagNames.Add(tag);
+                    }
+                }
+            }
+            NewTagInput = string.Empty; // Clear input after adding
+        }
+    }
+
+    private void RemoveTag(object tagIdentifier, bool isNew)
+    {
+        if (isNew && tagIdentifier is string tagName)
+        {
+            ProductCommand.NewTagNames.Remove(tagName);
+        }
+        else if (!isNew && tagIdentifier is Guid tagId)
+        {
+            ProductCommand.TagIds.Remove(tagId);
+        }
+    }
+
+    private void AddExistingTag(Guid tagId)
+    {
+        if (!ProductCommand.TagIds.Contains(tagId))
+        {
+            ProductCommand.TagIds.Add(tagId);
+        }
+    }
 }
 
