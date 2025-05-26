@@ -13,7 +13,6 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
 
     public async Task<Guid> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
-        // var category = _mapper.Map<Category>(request);
         var category = new Category
         {
             Id = Guid.NewGuid(),

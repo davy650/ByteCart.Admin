@@ -1,0 +1,129 @@
+@page "/categories/edit/{CategoryId:guid}"
+
+@inject IMediator Mediator
+@inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
+
+@rendermode InteractiveServer
+
+<h3>Edit Category</h3>
+
+@if (CategoryCommand == null || AllCategories == null)
+{
+    <p><em>Loading ...</em></p>
+}
+else
+{
+    <EditForm Model="@CategoryCommand" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group mb-3">
+            <label for="name">Name:</label>
+            <InputText id="name" @bind-Value="CategoryCommand.Name" class="form-control" />
+        </div>
+        <div class="form-group mb-3">
+            <label for="description">Description:</label>
+            <InputTextArea id="description" @bind-Value="CategoryCommand.Description" class="form-control" />
+        </div>
+        <div class="form-group mb-3">
+            <label for="parentCategory">Parent Category (Optional):</label>
+            <InputSelect id="parentCategory" @bind-Value="CategoryCommand.ParentCategoryId" class="form-control">
+                <option value="">-- No Parent (Top-Level) --</option>
+                @foreach (var cat in AllCategories.Where(c => c.Id != CategoryCommand.Id && !IsAncestorOf(c.Id, CategoryCommand.Id)))
+                {
+                    <option value="@cat.Id">@cat.Name</option>
+                }
+            </InputSelect>
+            <small class="form-text text-muted">A category cannot be its own parent or a descendant of itself.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Update Category</button>
+        <a href="/categories" class="btn btn-secondary mt-3">Cancel</a>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public Guid CategoryId { get; set; }
+
+    private UpdateCategoryCommand CategoryCommand = new();
+    private List<CategoryDto> AllCategories = new(); // Used to populate the parent category dropdown
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategoryForEdit();
+        await LoadAllCategories(); 
+    }
+
+    private async Task LoadCategoryForEdit()
+    {
+        try
+        {
+            var categoryQuery = new GetCategoryByIdQueryCommand() { Id = CategoryId };
+            var categoryData = await Mediator.Send(categoryQuery);
+            CategoryCommand = new UpdateCategoryCommand
+            {
+                Id = categoryData.Id,
+                Name = categoryData.Name,
+                Description = categoryData.Description,
+                ParentCategoryId = categoryData.ParentCategoryId
+            };
+        }
+        catch (ApplicationException ex)
+        {
+            Console.WriteLine($"Error loading category for edit: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+            NavManager.NavigateTo("/categories"); // Redirect if not found
+        }
+    }
+
+    private async Task LoadAllCategories()
+    {
+        var getAllCategoriesQuery = new GetCategoryListQueryCommand();
+        AllCategories = await Mediator.Send(getAllCategoriesQuery);
+    }
+
+    // Helper to prevent a category from becoming a child of its own descendant
+    // TODO: we will need to handle this on server-side as well 
+    private bool IsAncestorOf(Guid potentialAncestorId, Guid currentCategoryId)
+    {
+        // Traverse up the tree from currentCategory to see if potentialAncestorId is in its path
+        var current = AllCategories.FirstOrDefault(c => c.Id == currentCategoryId);
+        while (current != null)
+        {
+            if (current.ParentCategoryId == potentialAncestorId)
+            {
+                return true;
+            }
+            current = AllCategories.FirstOrDefault(c => c.Id == current.ParentCategoryId);
+        }
+        return false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await Mediator.Send(CategoryCommand);
+            await JSRuntime.InvokeVoidAsync("alert", "Category updated successfully!");
+            NavManager.NavigateTo($"/categories"); // Redirect to category list
+        }
+        
+        catch (ApplicationException ex) // Catch specific application exceptions
+        {
+            Console.WriteLine($"Business Rule Error: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating category: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error updating category: {ex.Message}");
+        }
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        Console.WriteLine("Invalid submission.");
+    }
+}

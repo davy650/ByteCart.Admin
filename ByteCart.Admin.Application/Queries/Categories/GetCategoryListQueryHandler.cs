@@ -19,18 +19,43 @@ namespace ByteCart.Admin.Application.Queries.Categories
         public async Task<List<CategoryDto>> Handle(GetCategoryListQueryCommand request, CancellationToken cancellationToken)
         {
             var categories = await _context.Categories
+                .Include(p => p.ProductCategories)
                 .OrderBy(c => c.Name)
+                .Select(c => new CategoryDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description,
+                    ParentCategoryId = c.ParentCategoryId,
+                    CreatedAt = c.CreatedAt,
+                    CreatedBy = c.CreatedBy,
+                    ProductCount = c.ProductCategories.Count,
+                })
                 .ToListAsync(cancellationToken);
 
-            return categories.Select(c => new CategoryDto
+            var levelOneCategories = categories
+                .Where(c => c.ParentCategoryId == null)
+                .ToList();
+
+            foreach (var category in levelOneCategories)
             {
-                Id = c.Id,
-                Name = c.Name,
-                Description = c.Description,
-                ParentCategoryId = c.ParentCategoryId,
-                CreatedAt = c.CreatedAt,
-                CreatedBy = c.CreatedBy
-            }).ToList();
+                BuildNestedCategoryTree(category, categories);
+            }
+
+            return levelOneCategories;
+        }
+
+        private void BuildNestedCategoryTree(CategoryDto category, List<CategoryDto> allCategories)
+        {
+            category.SubCategories = allCategories
+                .Where(c => c.ParentCategoryId == category.Id)
+                .OrderBy(c => c.Name)
+                .ToList();
+
+            foreach (var subCategory in category.SubCategories)
+            {
+                BuildNestedCategoryTree(subCategory, allCategories);
+            }
         }
     }
 }

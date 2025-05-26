@@ -1,0 +1,62 @@
+@rendermode InteractiveServer
+
+<div class="category-item" style="margin-left: @(Level * 20)px;">
+    <span class="category-name">
+        <i class="bi @(Category.SubCategories.Any() ? "bi-folder-fill" : "bi-folder") me-2"></i>
+        <strong>@Category.Name</strong>
+        @if (!string.IsNullOrWhiteSpace(Category.Description))
+        {
+            <small class="text-muted">(@Category.Description)</small>
+        }
+        @if (Category.ProductCount > 0)
+        {
+            <span class="badge bg-secondary ms-2">@Category.ProductCount Products</span>
+        }
+    </span>
+    <span class="category-actions ms-auto">
+        <a href="/categories/edit/@Category.Id" class="btn btn-sm btn-primary me-2">Edit</a>
+        <button @onclick="(() => OnDelete.InvokeAsync(Category.Id))" class="btn btn-sm btn-danger">Delete</button>
+    </span>
+</div>
+@if (Category.SubCategories.Any())
+{
+    <div class="sub-categories">
+        @foreach (var subCategory in Category.SubCategories.OrderBy(c => c.Name))
+        {
+            <CategoryTree Category="subCategory" Level="@(Level + 1)" OnDelete="OnDelete" />
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public CategoryDto Category { get; set; } = default!;
+
+    [Parameter]
+    public int Level { get; set; } = 0; // Tracks nesting level for indentation
+
+    [Parameter]
+    public EventCallback<Guid> OnDelete { get; set; }
+}
+
+<style>
+    .category-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+        background-color: #f8f9fa;
+        margin-top: 5px;
+    }
+
+    .category-name {
+        flex-grow: 1;
+        font-size: 1.1em;
+    }
+
+    .sub-categories {
+        border-left: 2px dotted #ccc;
+        margin-left: 10px; /* Adjust based on your indentation */
+        padding-left: 10px;
+    }
+</style>

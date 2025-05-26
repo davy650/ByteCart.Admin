@@ -1,0 +1,79 @@
+@page "/categories"
+@inject IMediator Mediator
+@inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
+
+@rendermode InteractiveServer
+
+<h3>Category Management</h3>
+
+<p>Manage your product categories.</p>
+
+@if (Categories == null)
+{
+    <p><em>Loading categories...</em></p>
+}
+else if (!Categories.Any())
+{
+    <p>No categories found. Click "Add New Category" to get started.</p>
+}
+else
+{
+    <div class="category-tree">
+        @foreach (var category in Categories.OrderBy(c => c.Name))
+        {
+            <CategoryTree Category="category" OnDelete="HandleDeleteCategory" />
+        }
+    </div>
+}
+
+<a href="/categories/create" class="btn btn-success mt-3">Add New Category</a>
+
+@code {
+    private IEnumerable<CategoryDto>? Categories;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategories();
+    }
+
+    private async Task LoadCategories()
+    {
+        try
+        {
+            var categoryQuery = new GetCategoryListQueryCommand();
+            Categories = await Mediator.Send(categoryQuery);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading categories: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error loading categories: {ex.Message}");
+        }
+    }
+
+    private async Task HandleDeleteCategory(Guid categoryId)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this category? This action cannot be undone.");
+        if (confirmed)
+        {
+            try
+            {
+                @* await Mediator.Send(new DeleteCategoryCommand { Id = categoryId }); *@
+                await JSRuntime.InvokeVoidAsync("alert", "Category deleted successfully!");
+                await LoadCategories(); // Reload the list
+            }
+            catch (ApplicationException ex)
+            {
+                // Business rule violation (e.g., category has sub-categories or products)
+                await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // General error during deletion
+                Console.WriteLine($"Error deleting category: {ex.Message}");
+                await JSRuntime.InvokeVoidAsync("alert", $"An unexpected error occurred during deletion: {ex.Message}");
+            }
+        }
+    }
+}
