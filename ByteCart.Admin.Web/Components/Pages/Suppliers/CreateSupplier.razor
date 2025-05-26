@@ -1,0 +1,59 @@
+@page "/suppliers/create"
+@inject IMediator Mediator
+@inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
+
+@rendermode InteractiveServer
+
+<h3>Add New Supplier</h3>
+
+<EditForm Model="@createSupplierCommand" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group mb-3">
+        <label for="name">Name:</label>
+        <InputText id="name" @bind-Value="createSupplierCommand.Name" class="form-control" />
+    </div>
+    <div class="form-group mb-3">
+        <label for="contactEmail">Contact Email:</label>
+        <InputText id="contactEmail" @bind-Value="createSupplierCommand.ContactEmail" class="form-control" />
+    </div>
+    <div class="form-group mb-3">
+        <label for="contactNumber">Phone Number:</label>
+        <InputText id="contactNumber" @bind-Value="createSupplierCommand.ContactNumber" class="form-control" />
+    </div>
+    <div class="form-group mb-3">
+        <label for="website">Website:</label>
+        <InputTextArea id="website" @bind-Value="createSupplierCommand.Website" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Create Supplier</button>
+    <a href="/suppliers" class="btn btn-secondary mt-3">Cancel</a>
+</EditForm>
+
+@code {
+    private CreateSupplierCommand createSupplierCommand = new();
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var newSupplierId = await Mediator.Send(createSupplierCommand);
+            await JSRuntime.InvokeVoidAsync("alert", "Supplier created successfully!");
+            NavManager.NavigateTo($"/suppliers/details/{newSupplierId}"); // Redirect to new supplier details or list
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating supplier: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error creating supplier: {ex.Message}");
+        }
+    }
+
+    private async Task HandleInvalidSubmit()
+    {
+        // DataAnnotationsValidator and ValidationSummary will display errors automatically.
+        Console.WriteLine("Invalid submission.");
+        await Task.CompletedTask;
+    }
+}

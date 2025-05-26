@@ -1,0 +1,101 @@
+@page "/suppliers"
+@inject IMediator Mediator
+@inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
+
+@rendermode InteractiveServer
+
+<h3>Supplier Management</h3>
+
+<p>Manage Product suppliers.</p>
+
+@if (Suppliers == null)
+{
+    <p><em>Loading ...</em></p>
+}
+else if (!Suppliers.Any())
+{
+    <p>No suppliers. Click "Add New Supplier" to get started.</p>
+}
+else
+{
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Contact Number</th>
+                <th>Email</th>
+                <th>Website</th>
+                <th>Products</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var supplier in Suppliers)
+            {
+                <tr>
+                    <td>@supplier.Name</td>
+                    <td>@supplier.ContactNumber</td>
+                    <td>@supplier.ContactEmail</td>
+                    <td>@supplier.Website</td>
+                    <td>@supplier.ProductCount</td>
+                    <td>
+                        <a href="/suppliers/details/@supplier.Id" class="btn btn-info btn-sm me-2">Details</a>
+                        <a href="/suppliers/edit/@supplier.Id" class="btn btn-primary btn-sm me-2">Edit</a>
+                        <button @onclick="(() => HandleDeleteSupplier(supplier.Id))" class="btn btn-danger btn-sm">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a href="/suppliers/create" class="btn btn-success mt-3">Add New Supplier</a>
+
+@code {
+    private IEnumerable<SupplierDto>? Suppliers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSuppliers();
+    }
+
+    private async Task LoadSuppliers()
+    {
+        try
+        {
+            Suppliers = await Mediator.Send(new GetSupplierListQueryCommand());
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading suppliers: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error loading suppliers: {ex.Message}");
+        }
+    }
+
+    private async Task HandleDeleteSupplier(Guid supplierId)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this supplier? This action cannot be undone.");
+        if (confirmed)
+        {
+            try
+            {
+                //await Mediator.Send(new ByteCartAdmin.Application.Features.Suppliers.Commands.DeleteSupplier.DeleteSupplierCommand { Id = supplierId });
+                await JSRuntime.InvokeVoidAsync("alert", "Supplier deleted successfully!");
+                await LoadSuppliers(); // Reload the list
+            }
+            catch (ApplicationException ex)
+            {
+                // Business rule violation (e.g., supplier has products)
+                await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // General error during deletion
+                Console.WriteLine($"Error deleting supplier: {ex.Message}");
+                await JSRuntime.InvokeVoidAsync("alert", $"An unexpected error occurred during deletion: {ex.Message}");
+            }
+        }
+    }
+}

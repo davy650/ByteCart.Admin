@@ -31,7 +31,8 @@ namespace ByteCart.Admin.Application.Queries.Suppliers
                 CreatedAt = c.CreatedAt,
                 CreatedBy = c.CreatedBy,
                 ModifiedAt = c.ModifiedAt,
-                ModifiedBy = c.ModifiedBy
+                ModifiedBy = c.ModifiedBy,
+                ProductCount = _context.Products.Count(p => p.SupplierId == c.Id)
             }).ToList();
 
         }
