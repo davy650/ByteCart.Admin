@@ -1,0 +1,284 @@
+@page "/products/edit/{ProductId:guid}"
+@inject IMediator Mediator
+@inject NavigationManager navigationManager
+@inject IJSRuntime JSRuntime
+
+@rendermode InteractiveServer
+
+<h3>Edit Product</h3>
+
+@if (updateProductCommand == null)
+{
+    <p><em>Loading ...</em></p>
+}
+else
+{
+    <EditForm Model="@updateProductCommand" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <InputText id="name" @bind-Value="updateProductCommand.Name" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="sku">SKU:</label>
+            <InputText id="sku" @bind-Value="updateProductCommand.SKU" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <InputTextArea id="description" @bind-Value="updateProductCommand.Description" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <InputNumber id="price" @bind-Value="updateProductCommand.Price" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="costPrice">Cost Price:</label>
+            <InputNumber id="costPrice" @bind-Value="updateProductCommand.CostPrice" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="stockQuantity">Stock Quantity:</label>
+            <InputNumber id="stockQuantity" @bind-Value="updateProductCommand.StockQuantity" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="status">Status:</label>
+            <InputSelect @bind-Value="updateProductCommand.Status" class="form-control">
+                @foreach (var status in Enum.GetValues(typeof(ProductStatus)))
+                {
+                    <option value="@status">@status</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="form-group">
+            <label for="supplier">Supplier:</label>
+            <InputSelect @bind-Value="updateProductCommand.SupplierId" class="form-control">
+                <option value="">Select Supplier</option>
+                @foreach (var supplier in Suppliers)
+                {
+                    <option value="@supplier.Id">@supplier.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="form-group">
+            <label>Categories:</label>
+            @if (Categories.Any())
+            {
+                <div class="form-check">
+                    @foreach (var category in Categories)
+                    {
+                        <input type="checkbox" id="category_@category.Id" @onchange="(e) => ToggleCategory(category.Id, e.Value is bool b && b)"
+                            checked="@updateProductCommand.Categories.Contains(category.Id)" />
+                        <label for="category_@category.Id">@category.Name</label><br />
+                    }
+                </div>
+            }
+            else
+            {
+                <p>No categories available. Please add</p>
+            }
+        </div>
+        <div class="form-group">
+            <label>Tags:</label>
+            <input type="text" @bind-value="NewTagInput" placeholder="Add new tags (comma-separated)" @onkeydown="HandleTagInputKeyDown" class="form-control" />
+            <div class="mt-2">
+                @foreach (var tagId in updateProductCommand.Tags.ToList()) // Use ToList() to allow modification during iteration
+                {
+                    var tagName = ExistingTags.FirstOrDefault(t => t.Id == tagId)?.Name;
+                    if (tagName != null)
+                    {
+                        <span class="badge bg-info me-1">@tagName <button type="button" class="btn-close ms-1" @onclick="() => RemoveTag(tagId, isNew: false)"></button></span>
+                    }
+                }
+                @foreach (var newTagName in updateProductCommand.NewTagNames.ToList())
+                {
+                    <span class="badge bg-primary me-1">@newTagName <button type="button" class="btn-close ms-1" @onclick="() => RemoveTag(newTagName, isNew: true)"></button></span>
+                }
+            </div>
+            <p class="text-muted"><small>Existing tags:</small>
+            @foreach (var tag in ExistingTags.Where(t => !updateProductCommand.Tags.Contains(t.Id)))
+            {
+                <button type="button" class="btn btn-sm btn-outline-secondary m-1" @onclick="() => AddExistingTag(tag.Id)">@tag.Name</button>
+            }
+            </p>
+        </div>
+        <div class="form-group">
+            <label for="launchDate">Launch Date:</label>
+            <InputDate id="launchDate" @bind-Value="updateProductCommand.LaunchDate" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="endDate">End Date:</label>
+            <InputDate id="endDate" @bind-Value="updateProductCommand.EndDate" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Update Product</button>
+        <a href="/products" class="btn btn-secondary mt-3">Cancel</a>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public Guid ProductId { get; set; }
+
+    private UpdateProductCommand updateProductCommand = new(); // Use the Update command directly
+    private List<CategoryDto> Categories = new();
+    private List<SupplierDto> Suppliers = new();
+    private List<TagDto> ExistingTags = new(); // Assuming a TagDto
+    private string NewTagInput = string.Empty;
+    // private IBrowserFile[]? SelectedFiles; // For image uploads
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProductForEdit();
+        await LoadCategories();
+        await LoadSuppliers();
+        await LoadExistingTags();
+    }
+ 
+    private async Task LoadProductForEdit()
+    {
+        try
+        {
+            var productQuery = new GetProductByIdQueryCommand { Id = ProductId };
+            var productData = await Mediator.Send(productQuery);
+            
+            updateProductCommand = new UpdateProductCommand
+            {
+                Id = productData.Id,
+                Name = productData.Name,
+                SKU = productData.SKU,
+                Description = productData.Description,
+                Price = productData.Price,
+                CostPrice = productData.CostPrice,
+                StockQuantity = productData.StockQuantity,
+                Status = productData.Status,
+                SupplierId = productData.SupplierId,
+                Categories = productData.Categories.ToList(),
+                Tags = productData.Tags.ToList(),
+                LaunchDate = productData.LaunchDate,
+                EndDate = productData.EndDate ?? default
+                // ImageUrls = productData.ImageUrls // If implemented
+            };
+        }
+        catch (ApplicationException ex)
+        {
+            Console.WriteLine($"Error loading product for edit: {ex.Message}");
+            navigationManager.NavigateTo("/products"); // Redirect if product not found
+        }
+    }
+
+    private async Task LoadCategories()
+    {
+        var categoryListQuery = new GetCategoryListQueryCommand();
+        Categories = await Mediator.Send(categoryListQuery);
+    }
+
+    private async Task LoadSuppliers()
+    {
+        var suppliersQuery = new GetSupplierListQueryCommand();
+        Suppliers = await Mediator.Send(suppliersQuery);
+    }
+
+    private async Task LoadExistingTags()
+    {
+        var tagsQuery = new GetTagListQueryCommand();
+        ExistingTags = await Mediator.Send(tagsQuery);
+    }
+
+    private void ToggleCategory(Guid categoryId, bool isChecked)
+    {
+        if (isChecked)
+        {
+            if (!updateProductCommand.Categories.Contains(categoryId))
+            {
+                updateProductCommand.Categories.Add(categoryId);
+            }
+        }
+        else
+        {
+            updateProductCommand.Categories.Remove(categoryId);
+        }
+    }
+
+    private void HandleTagInputKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" || e.Key == "," && !string.IsNullOrWhiteSpace(NewTagInput))
+        {
+            var tags = NewTagInput.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            foreach (var tag in tags)
+            {
+                if (string.IsNullOrWhiteSpace(tag)) continue;
+
+                var existingTag = ExistingTags.FirstOrDefault(t => t.Name.Equals(tag, StringComparison.OrdinalIgnoreCase));
+                if (existingTag != null)
+                {
+                    if (!updateProductCommand.Tags.Contains(existingTag.Id))
+                    {
+                        updateProductCommand.Tags.Add(existingTag.Id);
+                    }
+                }
+                else
+                {
+                    if (!updateProductCommand.NewTagNames.Contains(tag, StringComparer.OrdinalIgnoreCase))
+                    {
+                        updateProductCommand.NewTagNames.Add(tag);
+                    }
+                }
+            }
+            NewTagInput = string.Empty;
+        }
+    }
+
+    private void RemoveTag(object tagIdentifier, bool isNew)
+    {
+        if (isNew && tagIdentifier is string tagName)
+        {
+            updateProductCommand.NewTagNames.Remove(tagName);
+        }
+        else if (!isNew && tagIdentifier is Guid tagId)
+        {
+            updateProductCommand.Tags.Remove(tagId);
+        }
+    }
+
+    private void AddExistingTag(Guid tagId)
+    {
+        if (!updateProductCommand.Tags.Contains(tagId))
+        {
+            updateProductCommand.Tags.Add(tagId);
+        }
+    }
+
+    // private void RemoveImage(string imageUrl)
+    // {
+    //     // Logic to remove image from ProductCommand.ImageUrls (and potentially delete from storage)
+    //     ProductCommand.ImageUrls.Remove(imageUrl);
+    //     StateHasChanged(); // To re-render the image list
+    // }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await Mediator.Send(updateProductCommand);
+            await JSRuntime.InvokeVoidAsync("alert", "Product updated successfully!");
+            navigationManager.NavigateTo($"/products/details/{ProductId}"); // Redirect to product details
+        }
+        catch (ValidationException ex)
+        {
+            Console.WriteLine("Validation Error:");
+            Console.WriteLine($"- {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Validation Failed: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating product: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error updating product: {ex.Message}");
+        }
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        Console.WriteLine("Invalid submission.");
+    }
+}

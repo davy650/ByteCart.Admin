@@ -32,38 +32,67 @@ namespace ByteCart.Admin.Application.Handlers.Products
             product.CostPrice = request.CostPrice;
             product.StockQuantity = request.StockQuantity;
             product.Status = request.Status;
-            product.LaunchDate = request.LaunchDate;
-            product.EndDate = request.EndDate;
+            product.LaunchDate = DateTime.SpecifyKind(request.LaunchDate, DateTimeKind.Utc);
+            product.EndDate = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Utc);
             product.SupplierId = request.SupplierId;
             product.ModifiedAt = DateTime.UtcNow;
             product.ModifiedBy = request.ModifiedBy;
 
-            // tags
-            foreach (var tag in request.Tags)
+            // Update ProductCategories (Many-to-Many)
+            var currentCategoryIds = product.ProductCategories.Select(pc => pc.CategoryId).ToList();
+            var categoriesToAdd = request.Categories.Except(currentCategoryIds).ToList();
+            var categoriesToRemove = currentCategoryIds.Except(request.Categories).ToList();
+
+            foreach (var categoryId in categoriesToAdd)
             {
-                product.ProductTags.Add(new ProductTag { TagId = tag, ProductId = product.Id });
+                product.ProductCategories.Add(new ProductCategory { ProductId = product.Id, CategoryId = categoryId });
+            }
+            foreach (var categoryId in categoriesToRemove)
+            {
+                var productCategoryToRemove = product.ProductCategories.FirstOrDefault(pc => pc.CategoryId == categoryId);
+                if (productCategoryToRemove != null)
+                {
+                    product.ProductCategories.Remove(productCategoryToRemove);
+                }
             }
 
-            // categories
-            foreach (var category in request.Categories)
+            // Update ProductTags (Many-to-Many)
+            var currentTagIds = product.ProductTags.Select(pt => pt.TagId).ToList();
+            var tagsToAdd = request.Tags.Except(currentTagIds).ToList();
+            var tagsToRemove = currentTagIds.Except(request.Tags).ToList();
+
+            foreach (var tagId in tagsToAdd)
             {
-                product.ProductCategories.Add(new ProductCategory { CategoryId = category, ProductId = product.Id });
+                product.ProductTags.Add(new ProductTag { ProductId = product.Id, TagId = tagId });
+            }
+            foreach (var tagId in tagsToRemove)
+            {
+                var productTagToRemove = product.ProductTags.FirstOrDefault(pt => pt.TagId == tagId);
+                if (productTagToRemove != null)
+                {
+                    product.ProductTags.Remove(productTagToRemove);
+                }
             }
 
-            // images
-            foreach (var image in request.Images)
+            // Handle new tags (similar to CreateProductCommand)
+            foreach (var newTagName in request.NewTagNames)
             {
-                product.Images.Add(new Image { Id = image, ProductId = product.Id });
+                // Check if tag already exists in DB
+                var existingTag = await _context.Tags.FirstOrDefaultAsync(t => t.Name.ToLower() == newTagName.ToLower(), cancellationToken);
+                if (existingTag == null)
+                {
+                    existingTag = new Tag { Id = Guid.NewGuid(), Name = newTagName };
+                    _context.Tags.Add(existingTag);
+                }
+
+                // Add the association if it doesn't already exist for this product
+                if (!product.ProductTags.Any(pt => pt.TagId == existingTag.Id))
+                {
+                    product.ProductTags.Add(new ProductTag { ProductId = product.Id, Tag = existingTag });
+                }
             }
 
-            // new tags
-            foreach (var tagName in request.NewTagNames)
-            {
-                var tag = new Tag { Id = Guid.NewGuid(), Name = tagName };
-                product.ProductTags.Add(new ProductTag { Tag = tag, ProductId = product.Id });
-                _context.Tags.Add(tag);
-            }
-
+            
             _context.Products.Update(product);
             await _context.SaveChangesAsync(cancellationToken);
             return true;

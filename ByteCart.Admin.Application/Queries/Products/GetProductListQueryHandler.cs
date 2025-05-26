@@ -92,7 +92,7 @@ namespace ByteCart.Admin.Application.Queries.Products
                 })
                 .ToListAsync(cancellationToken);
 
-            var paginatedList = new PaginatedList<ProductDto>(products, totalCount, request.PageNumber, request.PageSize);
+            var paginatedList = new PaginatedList<ProductDto>(products, totalCount, request.PageSize, request.PageNumber);
             return paginatedList;
         }
     }
