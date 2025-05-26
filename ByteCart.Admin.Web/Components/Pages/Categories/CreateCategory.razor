@@ -1,0 +1,90 @@
+@page "/categories/create"
+
+@inject IMediator Mediator
+@inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
+
+@rendermode InteractiveServer
+
+<h3>Add New Category</h3>
+
+@if (AllCategories == null)
+{
+    <p><em>Loading data...</em></p>
+}
+else
+{
+    <EditForm Model="@CategoryCommand" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group mb-3">
+            <label for="name">Name:</label>
+            <InputText id="name" @bind-Value="CategoryCommand.Name" class="form-control" />
+        </div>
+        <div class="form-group mb-3">
+            <label for="description">Description (Optional):</label>
+            <InputTextArea id="description" @bind-Value="CategoryCommand.Description" class="form-control" />
+        </div>
+        <div class="form-group mb-3">
+            <label for="parentCategory">Parent Category (Optional):</label>
+            <InputSelect id="parentCategory" @bind-Value="CategoryCommand.ParentCategoryId" class="form-control">
+                <option value="">-- No Parent (Top-Level Category) --</option>
+                @foreach (var category in AllCategories.OrderBy(c => c.Name))
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            </InputSelect>
+            <small class="form-text text-muted">Select a parent category to create a nested category.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Create Category</button>
+        <a href="/categories" class="btn btn-secondary mt-3">Cancel</a>
+    </EditForm>
+}
+
+@code {
+    private CreateCategoryCommand CategoryCommand = new();
+    private List<CategoryDto> AllCategories = new(); // For the parent category dropdown
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAllCategories();
+    }
+
+    private async Task LoadAllCategories()
+    {
+        try
+        {
+            var categoriesQuery = new GetCategoryListQueryCommand();
+            AllCategories = await Mediator.Send(categoriesQuery);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading categories for dropdown: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error loading categories for dropdown: {ex.Message}");
+            // Handle error, perhaps navigate back or display an error message
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var newCategoryId = await Mediator.Send(CategoryCommand);
+            await JSRuntime.InvokeVoidAsync("alert", "Category created successfully!");
+            NavManager.NavigateTo($"/categories/details/{newCategoryId}"); // Redirect to new category details or list
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating category: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error creating category: {ex.Message}");
+        }
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        // DataAnnotationsValidator and ValidationSummary will display errors automatically.
+        Console.WriteLine("Invalid submission.");
+    }
+}

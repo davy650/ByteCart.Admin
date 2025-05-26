@@ -59,7 +59,7 @@ else
         {
             try
             {
-                @* await Mediator.Send(new DeleteCategoryCommand { Id = categoryId }); *@
+                await Mediator.Send(new DeleteCategoryCommand { CategoryId = categoryId }); 
                 await JSRuntime.InvokeVoidAsync("alert", "Category deleted successfully!");
                 await LoadCategories(); // Reload the list
             }
