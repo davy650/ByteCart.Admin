@@ -38,7 +38,6 @@ namespace ByteCart.Admin.Application.Handlers.Products
             product.ModifiedAt = DateTime.UtcNow;
             product.ModifiedBy = request.ModifiedBy;
 
-            // Update ProductCategories (Many-to-Many)
             var currentCategoryIds = product.ProductCategories.Select(pc => pc.CategoryId).ToList();
             var categoriesToAdd = request.Categories.Except(currentCategoryIds).ToList();
             var categoriesToRemove = currentCategoryIds.Except(request.Categories).ToList();
@@ -56,7 +55,7 @@ namespace ByteCart.Admin.Application.Handlers.Products
                 }
             }
 
-            // Update ProductTags (Many-to-Many)
+            // Update ProductTags
             var currentTagIds = product.ProductTags.Select(pt => pt.TagId).ToList();
             var tagsToAdd = request.Tags.Except(currentTagIds).ToList();
             var tagsToRemove = currentTagIds.Except(request.Tags).ToList();
@@ -74,10 +73,9 @@ namespace ByteCart.Admin.Application.Handlers.Products
                 }
             }
 
-            // Handle new tags (similar to CreateProductCommand)
+            // Handle new tags
             foreach (var newTagName in request.NewTagNames)
             {
-                // Check if tag already exists in DB
                 var existingTag = await _context.Tags.FirstOrDefaultAsync(t => t.Name.ToLower() == newTagName.ToLower(), cancellationToken);
                 if (existingTag == null)
                 {
@@ -85,7 +83,6 @@ namespace ByteCart.Admin.Application.Handlers.Products
                     _context.Tags.Add(existingTag);
                 }
 
-                // Add the association if it doesn't already exist for this product
                 if (!product.ProductTags.Any(pt => pt.TagId == existingTag.Id))
                 {
                     product.ProductTags.Add(new ProductTag { ProductId = product.Id, Tag = existingTag });

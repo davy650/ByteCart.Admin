@@ -21,11 +21,9 @@ namespace ByteCart.Admin.Application.Queries.Categories
                 .Include(p => p.ProductCategories)
                 .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
-            // TODO: Aggregate to error handling middleware or throw custom exception
-
             if (category == null)
             {
-                return null;  
+                throw new Exception($"Category with ID {request.Id} not found."); 
             }
 
             return new CategoryDto
