@@ -1,7 +1,5 @@
-@inject NavigationManager NavManager
+@inject NavigationManager _navigationManager
 @inject IStringLocalizer<CultureSelector> _localizer
-@inject IJSRuntime JSRuntime
-
 
 @rendermode InteractiveServer
 
@@ -19,16 +17,16 @@
 
 @code {
     [Inject]
-    public IOptions<RequestLocalizationOptions> LocOptions { get; set; } = default!;
+    public IOptions<RequestLocalizationOptions> _localizationOptions { get; set; } = default!;
 
     private string currentCulture = CultureInfo.CurrentCulture.Name;
-    private List<CultureInfo> Cultures => LocOptions.Value.SupportedUICultures!.ToList();
+    private List<CultureInfo> Cultures => _localizationOptions.Value.SupportedUICultures!.ToList();
 
     protected override void OnInitialized()
     {
         currentCulture = CultureInfo.CurrentCulture.Name;
         // Check if the culture is specified in the url query string
-        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri);
         var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
         if (queryParams.TryGetValue("culture", out var cultureFromQuery))
         {
@@ -41,29 +39,14 @@
         var newCulture = e.Value?.ToString();
         if (newCulture != null)
         {
-            var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+            var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri);
             var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
 
-            // Set the culture parameter in the query string
             query["culture"] = newCulture;
 
-            // Rebuild the URI with the updated query string
             var newUri = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(uri.GetLeftPart(UriPartial.Path), query);
 
-            // Navigate to the new URI, forcing a full page reload to apply the culture
-            NavManager.NavigateTo(newUri, forceLoad: true);
-
-            // Alternative: Set a cookie for persistence.
-            // This requires JavaScript interop to set the cookie, as Blazor Server doesn't have direct access
-            // to HTTP response headers after the initial page load for non-interactive parts.
-            // For interactive components, you can use JS interop.
-            // await JSRuntime.InvokeVoidAsync("localStorage.setItem", "culture", newCulture);
-            // Example for setting cookie via JS:
-            // await JSRuntime.InvokeVoidAsync("setCookie",
-            //     CookieRequestCultureProvider.DefaultCookieName,
-            //     CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(newCulture)),
-            //     new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) });
-            // NavManager.NavigateTo(NavManager.Uri, forceLoad: true); // Reload current page after cookie is set
+            _navigationManager.NavigateTo(newUri, forceLoad: true);
         }
     }
 }
