@@ -24,7 +24,7 @@ ByteCart.AdminPortal/
 ### Prerequisites
 
 - [.NET 9 SDK](https://dotnet.microsoft.com)
-- SQL Server (local or remote)
+- PostgreSQL or SQL Server (local or remote)
 - Visual Studio 2022+ or VS Code
 
 ### Running the App
@@ -72,7 +72,7 @@ In `appsettings.json` (within `ByteCart.Admin.Web`), ensure your connection stri
 ## 🧠 How It Works
 
 - **Domain Layer** defines core models / entities like `Product`, `Category`, `Supplier`.
-- **Application Layer** uses MediatR for CQRS. Includes `Commands`, `Queries`, and `DTOs`.
+- **Application Layer** uses MediatR for CQRS. Includes `Commands`, `Handlers`, `Queries`, and `DTOs`.
 - **Infrastructure Layer** uses Entity Framework Core for persistence.
 - **Web Layer** is a Blazor Server app with component-based UI.
 
@@ -83,7 +83,7 @@ In `appsettings.json` (within `ByteCart.Admin.Web`), ensure your connection stri
 1. Create a DTO in `Application/DTOs`.
 2. Add `Command/Query` + `Handler` via MediatR.
 3. Update `DbContext` and repositories in `Infrastructure`.
-4. Add UI in `Pages` or `Components` in `Presentation`.
+4. Add UI in `Pages` or `Components` in `Web`.
 
 ---
 
@@ -92,27 +92,6 @@ In `appsettings.json` (within `ByteCart.Admin.Web`), ensure your connection stri
 *(Optional section if testing is added)*
 
 - Use `xUnit` for unit testing.
-- Use `bUnit` for Blazor component tests.
-
----
-
-## 👤 Sample Admin Credentials *(If Auth Is Implemented)*
-
-```text
-Username: admin@bytecart.com
-Password: Admin@123
-```
-
----
-
-## 🛣️ Roadmap
-
-- ✅ Product management (CRUD)
-- ⬜️ Authentication & Authorization
-- ⬜️ Image upload to Azure Blob or local
-- ⬜️ Localization
-- ⬜️ Unit testing
-- ⬜️ Responsive UI
 
 ---
 
