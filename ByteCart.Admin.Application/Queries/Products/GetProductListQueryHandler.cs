@@ -88,7 +88,8 @@ namespace ByteCart.Admin.Application.Queries.Products
                     EndDate = p.EndDate,
                     SupplierId = p.SupplierId,
                     CreatedAt = p.CreatedAt,
-                    CreatedBy = p.CreatedBy
+                    CreatedBy = p.CreatedBy,
+                    SupplierName = p.Supplier.Name,
                 })
                 .ToListAsync(cancellationToken);
 

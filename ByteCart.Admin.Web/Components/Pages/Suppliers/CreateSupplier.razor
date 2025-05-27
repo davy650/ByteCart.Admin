@@ -8,8 +8,6 @@
 <h3>Add New Supplier</h3>
 
 <EditForm Model="@createSupplierCommand" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
 
     <div class="form-group mb-3">
         <label for="name">Name:</label>

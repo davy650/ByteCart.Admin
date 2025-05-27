@@ -14,44 +14,57 @@
 else
 {
     <EditForm Model="@updateProductCommand" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
 
-        <div class="form-group">
-            <label for="name">Name:</label>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"for="name">Name:</label>
+            <div class="col-sm-10">
             <InputText id="name" @bind-Value="updateProductCommand.Name" class="form-control" />
+            </div>
         </div>
-        <div class="form-group">
-            <label for="sku">SKU:</label>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"for="sku">SKU:</label>
+            <div class="col-sm-10">
             <InputText id="sku" @bind-Value="updateProductCommand.SKU" class="form-control" />
+            </div>
         </div>
-        <div class="form-group">
-            <label for="description">Description:</label>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"for="description">Description:</label>
+            <div class="col-sm-10">
             <InputTextArea id="description" @bind-Value="updateProductCommand.Description" class="form-control" />
+            </div>
         </div>
-        <div class="form-group">
-            <label for="price">Price:</label>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"for="price">Price:</label>
+            <div class="col-sm-10">
             <InputNumber id="price" @bind-Value="updateProductCommand.Price" class="form-control" />
+            </div>
         </div>
-        <div class="form-group">
-            <label for="costPrice">Cost Price:</label>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"for="costPrice">Cost Price:</label>
+            <div class="col-sm-10">
             <InputNumber id="costPrice" @bind-Value="updateProductCommand.CostPrice" class="form-control" />
+            </div>
         </div>
-        <div class="form-group">
-            <label for="stockQuantity">Stock Quantity:</label>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"for="stockQuantity">Stock Quantity:</label>
+            <div class="col-sm-10">
             <InputNumber id="stockQuantity" @bind-Value="updateProductCommand.StockQuantity" class="form-control" />
+            </div>
         </div>
-        <div class="form-group">
-            <label for="status">Status:</label>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"for="status">Status:</label>
+            <div class="col-sm-10">
             <InputSelect @bind-Value="updateProductCommand.Status" class="form-control">
                 @foreach (var status in Enum.GetValues(typeof(ProductStatus)))
                 {
                     <option value="@status">@status</option>
                 }
             </InputSelect>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="supplier">Supplier:</label>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"for="supplier">Supplier:</label>
+            <div class="col-sm-10">
             <InputSelect @bind-Value="updateProductCommand.SupplierId" class="form-control">
                 <option value="">Select Supplier</option>
                 @foreach (var supplier in Suppliers)
@@ -59,9 +72,11 @@ else
                     <option value="@supplier.Id">@supplier.Name</option>
                 }
             </InputSelect>
+            </div>
         </div>
-        <div class="form-group">
-            <label>Categories:</label>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label">Categories:</label>
+            <div class="col-sm-10">
             @if (Categories.Any())
             {
                 <div class="form-check">
@@ -77,9 +92,11 @@ else
             {
                 <p>No categories available. Please add</p>
             }
+            </div>
         </div>
-        <div class="form-group">
-            <label>Tags:</label>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label">Tags:</label>
+            <div class="col-sm-10">
             <input type="text" @bind-value="NewTagInput" placeholder="Add new tags (comma-separated)" @onkeydown="HandleTagInputKeyDown" class="form-control" />
             <div class="mt-2">
                 @foreach (var tagId in updateProductCommand.Tags.ToList()) // Use ToList() to allow modification during iteration
@@ -101,14 +118,19 @@ else
                 <button type="button" class="btn btn-sm btn-outline-secondary m-1" @onclick="() => AddExistingTag(tag.Id)">@tag.Name</button>
             }
             </p>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="launchDate">Launch Date:</label>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"for="launchDate">Launch Date:</label>
+            <div class="col-sm-10">
             <InputDate id="launchDate" @bind-Value="updateProductCommand.LaunchDate" class="form-control" />
+            </div>
         </div>
-        <div class="form-group">
-            <label for="endDate">End Date:</label>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label"for="endDate">End Date:</label>
+            <div class="col-sm-10">
             <InputDate id="endDate" @bind-Value="updateProductCommand.EndDate" class="form-control" />
+            </div>
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Update Product</button>

@@ -34,13 +34,13 @@ else
                 <dd class="col-sm-9">@Product.Status</dd>
 
                 <dt class="col-sm-3">Supplier</dt>
-                <dd class="col-sm-9">@Product.SupplierId</dd>
+                <dd class="col-sm-9">@Product.SupplierName</dd>
 
                 <dt class="col-sm-3">Categories</dt>
                 <dd class="col-sm-9">
-                    @if (Product.Categories.Any())
+                    @if (Product.CategoryNames.Any())
                     {
-                        @string.Join(", ", Product.Categories)
+                        @string.Join(", ", Product.CategoryNames)
                     }
                     else
                     {
@@ -50,9 +50,12 @@ else
 
                 <dt class="col-sm-3">Tags</dt>
                 <dd class="col-sm-9">
-                    @if (Product.Tags.Any())
+                    @if (Product.TagNames.Any())
                     {
-                        @string.Join(", ", Product.Tags)
+                        foreach (var tag in Product.TagNames)
+                        {
+                            <span class="badge bg-secondary">@tag</span>
+                        }
                     }
                     else
                     {

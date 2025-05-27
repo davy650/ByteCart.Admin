@@ -52,6 +52,9 @@ namespace ByteCart.Admin.Application.Queries.Products
                 ModifiedBy = product.ModifiedBy,
                 Tags = product.ProductTags.Select(pt => pt.TagId),
                 Categories = product.ProductCategories.Select(pc => pc.CategoryId),
+                SupplierName = product.Supplier?.Name,
+                TagNames = product.ProductTags.Select(pt => pt.Tag.Name),
+                CategoryNames = product.ProductCategories.Select(pc => pc.Category.Name),
                 Images = product.Images.Select(i => i.Id),
             };
 
