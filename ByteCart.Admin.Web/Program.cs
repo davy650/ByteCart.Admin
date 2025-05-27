@@ -1,4 +1,8 @@
+using System.Globalization;
+using System.Reflection;
 using ByteCart.Admin.Web.Components;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +12,29 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
+
+// Start: Add localization support & Config
+builder.Services.AddLocalization();
+
+var cultures = new List<CultureInfo>
+{
+    new CultureInfo("en-US"),
+    new CultureInfo("sw-KE")
+};
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture(cultures[0]);
+    options.SupportedCultures = cultures;
+    options.SupportedUICultures = cultures;
+});
+
+builder.Services.AddSingleton<IStringLocalizerFactory, ResourceManagerStringLocalizerFactory>();
+builder.Services.AddSingleton(typeof(IStringLocalizer<>), typeof(StringLocalizer<>));
+
+builder.Services.AddTransient(sp => sp.GetRequiredService<IStringLocalizerFactory>().Create("SharedResources", Assembly.GetExecutingAssembly().GetName().Name!));
+
+// End: Add localization support & Config
 
 var app = builder.Build();
 
@@ -25,6 +52,9 @@ app.UseHttpsRedirection();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+
+app.UseRequestLocalization(); 
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

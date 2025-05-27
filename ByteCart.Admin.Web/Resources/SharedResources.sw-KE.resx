@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="Name" xml:space="preserve">
+    <value>Jina</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Maelezo</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Hariri</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Futa</value>
+  </data>
+  <data name="BackToList" xml:space="preserve">
+    <value>Rudi kwenye Orodha</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Unda</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Sasisha</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Ghairi</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Hifadhi</value>
+  </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Una uhakika unataka kufuta kipengee hiki? Kitendo hiki hakiwezi kutenduliwa.</value>
+  </data>
+  <data name="SuccessMessage" xml:space="preserve">
+    <value>{0} imefanikiwa!</value>
+  </data>
+  <data name="ErrorMessage" xml:space="preserve">
+    <value>Hitilafu: {0}</value>
+  </data>
+  <data name="LoadingData" xml:space="preserve">
+    <value>Inapakia data...</value>
+  </data>
+  <data name="NoItemsFound" xml:space="preserve">
+    <value>Hakuna {0} zimepatikana. Bonyeza "{1}" kuanza.</value>
+  </data>
+  <data name="CategoryManagement" xml:space="preserve">
+    <value>Usimamizi wa Jamii</value>
+  </data>
+  <data name="CategoryManagementDescription" xml:space="preserve">
+    <value>Dhibiti kategoria za bidhaa zako. Kategoria zinaweza kupangiliwa kwa uongozi.</value>
+  </data>
+  <data name="AddNewCategory" xml:space="preserve">
+    <value>Ongeza Jamii Mpya</value>
+  </data>
+  <data name="CategoryDetails" xml:space="preserve">
+    <value>Maelezo ya Jamii</value>
+  </data>
+  <data name="ParentCategory" xml:space="preserve">
+    <value>Jamii Mzazi</value>
+  </data>
+  <data name="TopLevelCategory" xml:space="preserve">
+    <value>Jamii Kuu</value>
+  </data>
+  <data name="NoParent" xml:space="preserve">
+    <value>-- Hakuna Mzazi (Jamii Kuu) --</value>
+  </data>
+  <data name="DirectProducts" xml:space="preserve">
+    <value>Bidhaa za Moja kwa Moja</value>
+  </data>
+  <data name="SubCategories" xml:space="preserve">
+    <value>Jumii Ndogo</value>
+  </data>
+  <data name="NoDirectSubCategories" xml:space="preserve">
+    <value>Hakuna jamii ndogo za moja kwa moja.</value>
+  </data>
+  <data name="SupplierManagement" xml:space="preserve">
+    <value>Usimamizi wa Wasambazaji</value>
+  </data>
+  <data name="SupplierManagementDescription" xml:space="preserve">
+    <value>Hapa unaweza kudhibiti wasambazaji wako wa bidhaa.</value>
+  </data>
+  <data name="AddNewSupplier" xml:space="preserve">
+    <value>Ongeza Msambazaji Mpya</value>
+  </data>
+  <data name="ContactPerson" xml:space="preserve">
+    <value>Mtu wa Mawasiliano</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Barua pepe</value>
+  </data>
+  <data name="PhoneNumber" xml:space="preserve">
+    <value>Nambari ya Simu</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Anwani</value>
+  </data>
+  <data name="ProductsSupplied" xml:space="preserve">
+    <value>Bidhaa Zinazotolewa</value>
+  </data>
+  <data name="SupplierDetails" xml:space="preserve">
+    <value>Maelezo ya Msambazaji</value>
+  </data>
+  <data name="EditSupplier" xml:space="preserve">
+    <value>Hariri Msambazaji</value>
+  </data>
+  <data name="CreateSupplier" xml:space="preserve">
+    <value>Ongeza Msambazaji Mpya</value>
+  </data>
+   <data name="Category" xml:space="preserve">
+    <value>Jamii</value>
+  </data>
+    <data name="Categories" xml:space="preserve">
+    <value>Jamii</value>
+  </data>
+  <data name="Supplier" xml:space="preserve">
+    <value>Msambazaji</value>
+  </data>
+    <data name="Suppliers" xml:space="preserve">
+    <value>Wasambazaji</value>
+  </data>
+    <data name="Products" xml:space="preserve">
+    <value>Bidhaa</value>
+  </data>
+    <data name="Actions" xml:space="preserve">
+    <value>Vitendo</value>
+  </data>
+   <data name="SelectLanguage" xml:space="preserve">
+    <value>Chagua Lugha</value>
+  </data>
+</root>

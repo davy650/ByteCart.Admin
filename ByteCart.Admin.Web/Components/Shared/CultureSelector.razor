@@ -1,0 +1,70 @@
+@inject NavigationManager NavManager
+@inject IStringLocalizer<CultureSelector> _localizer
+@inject IJSRuntime JSRuntime
+
+
+@rendermode InteractiveServer
+
+<div class="culture-selector ms-auto">
+    <label for="culture-select" class="visually-hidden">@_localizer["SelectLanguage"]</label>
+    <select id="culture-select" class="form-select form-select-sm" @onchange="ChangeCulture">
+        @foreach (var culture in Cultures)
+        {
+            <option value="@culture.Name" selected="@(currentCulture.Equals(culture.Name, StringComparison.OrdinalIgnoreCase))">
+                @culture.DisplayName
+            </option>
+        }
+    </select>
+</div>
+
+@code {
+    [Inject]
+    public IOptions<RequestLocalizationOptions> LocOptions { get; set; } = default!;
+
+    private string currentCulture = CultureInfo.CurrentCulture.Name;
+    private List<CultureInfo> Cultures => LocOptions.Value.SupportedUICultures!.ToList();
+
+    protected override void OnInitialized()
+    {
+        currentCulture = CultureInfo.CurrentCulture.Name;
+        // Optionally, check if the current URI already has a culture query parameter
+        // If it does, ensure our dropdown matches it, otherwise set it from CurrentCulture
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        if (queryParams.TryGetValue("culture", out var cultureFromQuery))
+        {
+            currentCulture = cultureFromQuery.ToString();
+        }
+    }
+
+    private void ChangeCulture(ChangeEventArgs e)
+    {
+        var newCulture = e.Value?.ToString();
+        if (newCulture != null)
+        {
+            var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+            var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+
+            // Set the culture parameter in the query string
+            query["culture"] = newCulture;
+
+            // Rebuild the URI with the updated query string
+            var newUri = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(uri.GetLeftPart(UriPartial.Path), query);
+
+            // Navigate to the new URI, forcing a full page reload to apply the culture
+            NavManager.NavigateTo(newUri, forceLoad: true);
+
+            // Alternative: Set a cookie for persistence.
+            // This requires JavaScript interop to set the cookie, as Blazor Server doesn't have direct access
+            // to HTTP response headers after the initial page load for non-interactive parts.
+            // For interactive components, you can use JS interop.
+            // await JSRuntime.InvokeVoidAsync("localStorage.setItem", "culture", newCulture);
+            // Example for setting cookie via JS:
+            // await JSRuntime.InvokeVoidAsync("setCookie",
+            //     CookieRequestCultureProvider.DefaultCookieName,
+            //     CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(newCulture)),
+            //     new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) });
+            // NavManager.NavigateTo(NavManager.Uri, forceLoad: true); // Reload current page after cookie is set
+        }
+    }
+}
