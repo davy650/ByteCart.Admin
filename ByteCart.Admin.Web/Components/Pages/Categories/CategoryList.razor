@@ -2,16 +2,17 @@
 @inject IMediator Mediator
 @inject NavigationManager NavManager
 @inject IJSRuntime JSRuntime
+@inject IStringLocalizer<SharedResources> Localizer
 
 @rendermode InteractiveServer
 
-<h3>Category Management</h3>
+<h3>@Localizer["CategoryManagement"]</h3>
 
-<p>Manage your product categories.</p>
+<p>@Localizer["CategoryManagementDescription"]</p>
 
 @if (Categories == null)
 {
-    <p><em>Loading categories...</em></p>
+    <p><em>@Localizer["LoadingData"]</em></p>
 }
 else if (!Categories.Any())
 {

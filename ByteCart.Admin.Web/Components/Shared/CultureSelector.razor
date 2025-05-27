@@ -27,8 +27,7 @@
     protected override void OnInitialized()
     {
         currentCulture = CultureInfo.CurrentCulture.Name;
-        // Optionally, check if the current URI already has a culture query parameter
-        // If it does, ensure our dropdown matches it, otherwise set it from CurrentCulture
+        // Check if the culture is specified in the url query string
         var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
         var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
         if (queryParams.TryGetValue("culture", out var cultureFromQuery))
