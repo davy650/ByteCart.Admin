@@ -1,6 +1,8 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject IStringLocalizer<SharedResources> _localizer
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">ByteCart.Admin.Web</a>
+        <a class="navbar-brand" href="">ByteCart Admin</a>
     </div>
 </div>
 
@@ -16,19 +18,19 @@
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="products">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Products
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @_localizer["Products"]
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="categories">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Categories
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> @_localizer["Categories"]
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Suppliers">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Suppliers
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> @_localizer["Suppliers"]
             </NavLink>
         </div>
 
