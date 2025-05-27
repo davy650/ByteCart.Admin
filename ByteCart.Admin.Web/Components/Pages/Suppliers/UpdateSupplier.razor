@@ -1,7 +1,7 @@
 @page "/suppliers/edit/{SupplierId:guid}"
-@inject IMediator Mediator
-@inject NavigationManager NavManager
-@inject IJSRuntime JSRuntime
+@inject IMediator _mediator
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
 
 @rendermode InteractiveServer
 
@@ -56,7 +56,7 @@ else
         try
         {
             var supplerQueryCommand = new GetSupplierByIdQueryCommand { Id = SupplierId };
-            var supplierData = await Mediator.Send(supplerQueryCommand);
+            var supplierData = await _mediator.Send(supplerQueryCommand);
 
             // Map the DTO to the command model for the form
             updateSupplierCommand = new UpdateSupplierCommand
@@ -70,14 +70,12 @@ else
         }
         catch (ApplicationException ex)
         {
-            Console.WriteLine($"Error loading supplier for edit: {ex.Message}");
-            await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
-            NavManager.NavigateTo("/suppliers"); // Redirect if supplier not found
+            await _jsRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+            _navigationManager.NavigateTo("/suppliers"); 
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An unexpected error occurred while loading supplier: {ex.Message}");
-            await JSRuntime.InvokeVoidAsync("alert", $"An unexpected error occurred: {ex.Message}");
+            await _jsRuntime.InvokeVoidAsync("alert", $"An unexpected error occurred: {ex.Message}");
         }
     }
 
@@ -85,24 +83,22 @@ else
     {
         try
         {
-            await Mediator.Send(updateSupplierCommand);
-            await JSRuntime.InvokeVoidAsync("alert", "Supplier updated successfully!");
-            NavManager.NavigateTo($"/suppliers/details/{SupplierId}"); // Redirect to supplier details
+            await _mediator.Send(updateSupplierCommand);
+            await _jsRuntime.InvokeVoidAsync("alert", "Supplier updated successfully!");
+            _navigationManager.NavigateTo($"/suppliers/details/{SupplierId}"); 
         }
         catch (ApplicationException ex)
         {
-            Console.WriteLine($"Business Rule Error: {ex.Message}");
-            await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+            await _jsRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error updating supplier: {ex.Message}");
-            await JSRuntime.InvokeVoidAsync("alert", $"Error updating supplier: {ex.Message}");
+            await _jsRuntime.InvokeVoidAsync("alert", $"Error updating supplier: {ex.Message}");
         }
     }
 
     private void HandleInvalidSubmit()
     {
-        Console.WriteLine("Invalid submission.");
+        _jsRuntime.InvokeVoidAsync("alert", "Please correct the errors in the form.");
     }
 }

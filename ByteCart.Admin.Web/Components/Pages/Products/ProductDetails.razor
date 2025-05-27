@@ -1,6 +1,6 @@
 @page "/products/details/{ProductId:guid}"
-@inject IMediator Mediator
-@inject NavigationManager navigationManager
+@inject IMediator _mediator
+@inject NavigationManager _navigationManager
 
 @rendermode InteractiveServer
 
@@ -93,20 +93,15 @@ else
             try
             {
                 var query = new GetProductByIdQueryCommand { Id = ProductId };
-                Product = await Mediator.Send(query);
+                Product = await _mediator.Send(query);
             }
-            catch (ApplicationException ex) // Catch the exception thrown by the handler
+            catch (ApplicationException) 
             {
-                // Handle product not found case, e.g., redirect to 404 or product list
-                // TODO: Error handling
-                Console.WriteLine($"Error: {ex.Message}");
-                navigationManager.NavigateTo("/products", forceLoad: true); // Redirect to list if not found
+                _navigationManager.NavigateTo("/products", forceLoad: true); 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // General error handling
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                // Potentially navigate to an error page or show a toast message
+                // Handle other unexpected errors
             }
         }
     }

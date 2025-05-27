@@ -1,7 +1,7 @@
 @page "/products/edit/{ProductId:guid}"
-@inject IMediator Mediator
-@inject NavigationManager navigationManager
-@inject IJSRuntime JSRuntime
+@inject IMediator _mediator
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
 
 @rendermode InteractiveServer
 
@@ -142,12 +142,11 @@ else
     [Parameter]
     public Guid ProductId { get; set; }
 
-    private UpdateProductCommand updateProductCommand = new(); // Use the Update command directly
+    private UpdateProductCommand updateProductCommand = new(); 
     private List<CategoryDto> Categories = new();
     private List<SupplierDto> Suppliers = new();
-    private List<TagDto> ExistingTags = new(); // Assuming a TagDto
+    private List<TagDto> ExistingTags = new(); 
     private string NewTagInput = string.Empty;
-    // private IBrowserFile[]? SelectedFiles; // For image uploads
 
     protected override async Task OnInitializedAsync()
     {
@@ -162,7 +161,7 @@ else
         try
         {
             var productQuery = new GetProductByIdQueryCommand { Id = ProductId };
-            var productData = await Mediator.Send(productQuery);
+            var productData = await _mediator.Send(productQuery);
             
             updateProductCommand = new UpdateProductCommand
             {
@@ -179,32 +178,30 @@ else
                 Tags = productData.Tags.ToList(),
                 LaunchDate = productData.LaunchDate,
                 EndDate = productData.EndDate ?? default
-                // ImageUrls = productData.ImageUrls // If implemented
             };
         }
-        catch (ApplicationException ex)
+        catch (ApplicationException)
         {
-            Console.WriteLine($"Error loading product for edit: {ex.Message}");
-            navigationManager.NavigateTo("/products"); // Redirect if product not found
+            _navigationManager.NavigateTo("/products"); 
         }
     }
 
     private async Task LoadCategories()
     {
         var categoryListQuery = new GetCategoryListQueryCommand();
-        Categories = await Mediator.Send(categoryListQuery);
+        Categories = await _mediator.Send(categoryListQuery);
     }
 
     private async Task LoadSuppliers()
     {
         var suppliersQuery = new GetSupplierListQueryCommand();
-        Suppliers = await Mediator.Send(suppliersQuery);
+        Suppliers = await _mediator.Send(suppliersQuery);
     }
 
     private async Task LoadExistingTags()
     {
         var tagsQuery = new GetTagListQueryCommand();
-        ExistingTags = await Mediator.Send(tagsQuery);
+        ExistingTags = await _mediator.Send(tagsQuery);
     }
 
     private void ToggleCategory(Guid categoryId, bool isChecked)
@@ -271,36 +268,26 @@ else
         }
     }
 
-    // private void RemoveImage(string imageUrl)
-    // {
-    //     // Logic to remove image from ProductCommand.ImageUrls (and potentially delete from storage)
-    //     ProductCommand.ImageUrls.Remove(imageUrl);
-    //     StateHasChanged(); // To re-render the image list
-    // }
-
     private async Task HandleValidSubmit()
     {
         try
         {
-            await Mediator.Send(updateProductCommand);
-            await JSRuntime.InvokeVoidAsync("alert", "Product updated successfully!");
-            navigationManager.NavigateTo($"/products/details/{ProductId}"); // Redirect to product details
+            await _mediator.Send(updateProductCommand);
+            await _jsRuntime.InvokeVoidAsync("alert", "Product updated successfully!");
+            _navigationManager.NavigateTo($"/products/details/{ProductId}"); // Redirect to product details
         }
         catch (ValidationException ex)
         {
-            Console.WriteLine("Validation Error:");
-            Console.WriteLine($"- {ex.Message}");
-            await JSRuntime.InvokeVoidAsync("alert", $"Validation Failed: {ex.Message}");
+            await _jsRuntime.InvokeVoidAsync("alert", $"Validation Failed: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error updating product: {ex.Message}");
-            await JSRuntime.InvokeVoidAsync("alert", $"Error updating product: {ex.Message}");
+            await _jsRuntime.InvokeVoidAsync("alert", $"Error updating product: {ex.Message}");
         }
     }
 
     private void HandleInvalidSubmit()
     {
-        Console.WriteLine("Invalid submission.");
+        _jsRuntime.InvokeVoidAsync("alert", "Please correct the errors in the form.");
     }
 }

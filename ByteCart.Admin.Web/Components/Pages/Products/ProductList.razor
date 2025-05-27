@@ -1,7 +1,7 @@
 @page "/products"
 
-@inject IMediator Mediator
-@inject IJSRuntime JSRuntime
+@inject IMediator _mediator
+@inject IJSRuntime _jsRuntime
 
 @rendermode InteractiveServer 
 
@@ -169,7 +169,7 @@ else
             SortBy = SortBy
         };
 
-        PaginatedProductsList = await Mediator.Send(query);
+        PaginatedProductsList = await _mediator.Send(query);
         TotalPages = PaginatedProductsList?.TotalPages ?? 0;
         Products = PaginatedProductsList?.Items ?? new List<ProductDto>();
     }
@@ -196,11 +196,11 @@ else
 
     private async Task DeleteProduct(Guid productId)
     {
-        bool confirmDelete = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this product?");  
+        bool confirmDelete = await _jsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this product?");  
         if (confirmDelete) 
         {
             var deleteCommand = new DeleteProductCommand { ProductId = productId };
-            await Mediator.Send(deleteCommand);
+            await _mediator.Send(deleteCommand);
         }
         await LoadProducts();
     }
@@ -208,12 +208,12 @@ else
     private async Task LoadCategories()
     {   
         var categoriesQuery = new GetCategoryListQueryCommand();
-        Categories = await Mediator.Send(categoriesQuery);
+        Categories = await _mediator.Send(categoriesQuery);
     }
 
     private async Task LoadSuppliers()
     {
         var suppliersQuery = new GetSupplierListQueryCommand();
-        Suppliers = await Mediator.Send(suppliersQuery);
+        Suppliers = await _mediator.Send(suppliersQuery);
     }
 }

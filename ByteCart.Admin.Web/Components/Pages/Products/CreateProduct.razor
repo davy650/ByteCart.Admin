@@ -1,8 +1,8 @@
 @page "/products/create"
 
-@inject IMediator Mediator
-@inject NavigationManager NavigationManager
-@inject IJSRuntime JSRuntime
+@inject IMediator _mediator
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
 
 @rendermode InteractiveServer
 
@@ -161,24 +161,24 @@
     private async Task LoadExistingTags()
     {
         var tagsQuery = new GetTagListQueryCommand();
-        ExistingTags = await Mediator.Send(tagsQuery);
+        ExistingTags = await _mediator.Send(tagsQuery);
     }
 
     private async Task LoadSuppliers()
     {
         var suppliersQuery = new GetSupplierListQueryCommand();
-        Suppliers = await Mediator.Send(suppliersQuery);
+        Suppliers = await _mediator.Send(suppliersQuery);
     }
 
     private async Task LoadCategories()
     {
         var categoriesQuery = new GetCategoryListQueryCommand();
-        Categories = await Mediator.Send(categoriesQuery);
+        Categories = await _mediator.Send(categoriesQuery);
     }
 
 	private void HandleInvalidSubmit()
 	{
-		Console.WriteLine("Invalid submission.");
+        _jsRuntime.InvokeVoidAsync("alert", "Please correct the errors in the form.");
 	}
 
 
@@ -206,7 +206,6 @@
             {
                 if (string.IsNullOrWhiteSpace(tag)) continue;
 
-                // Check if it's an existing tag first
                 var existingTag = ExistingTags.FirstOrDefault(t => t.Name.Equals(tag, StringComparison.OrdinalIgnoreCase));
                 if (existingTag != null)
                 {
@@ -215,7 +214,7 @@
                         createProductCommand.Tags.Add(existingTag.Id);
                     }
                 }
-                else // It's a new tag
+                else 
                 {
                     if (!createProductCommand.NewTagNames.Contains(tag, StringComparer.OrdinalIgnoreCase))
                     {
@@ -223,7 +222,7 @@
                     }
                 }
             }
-            NewTagInput = string.Empty; // Clear input after adding
+            NewTagInput = string.Empty; 
         }
     }
 
@@ -251,14 +250,12 @@
     {
         try
         {
-            var productId = await Mediator.Send(createProductCommand);
-            NavigationManager.NavigateTo($"/products/details/{productId}"); // Redirect to product details or list
+            var productId = await _mediator.Send(createProductCommand);
+            _navigationManager.NavigateTo($"/products/details/{productId}"); 
         }
         catch (Exception ex)
         {
-            // General error handling
-            Console.WriteLine($"Error creating product: {ex.Message}");
-            await JSRuntime.InvokeVoidAsync("alert", $"Error creating product: {ex.Message}");
+            await _jsRuntime.InvokeVoidAsync("alert", $"Error creating product: {ex.Message}");
         }
     }
 

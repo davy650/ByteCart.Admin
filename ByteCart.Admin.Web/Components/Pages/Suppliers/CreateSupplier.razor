@@ -1,7 +1,7 @@
 @page "/suppliers/create"
-@inject IMediator Mediator
-@inject NavigationManager NavManager
-@inject IJSRuntime JSRuntime
+@inject IMediator _mediator
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
 
 @rendermode InteractiveServer
 
@@ -37,21 +37,18 @@
     {
         try
         {
-            var newSupplierId = await Mediator.Send(createSupplierCommand);
-            await JSRuntime.InvokeVoidAsync("alert", "Supplier created successfully!");
-            NavManager.NavigateTo($"/suppliers/details/{newSupplierId}"); // Redirect to new supplier details or list
+            var newSupplierId = await _mediator.Send(createSupplierCommand);
+            await _jsRuntime.InvokeVoidAsync("alert", "Supplier created successfully!");
+            _navigationManager.NavigateTo($"/suppliers/details/{newSupplierId}"); 
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error creating supplier: {ex.Message}");
-            await JSRuntime.InvokeVoidAsync("alert", $"Error creating supplier: {ex.Message}");
+            await _jsRuntime.InvokeVoidAsync("alert", $"Error creating supplier: {ex.Message}");
         }
     }
 
     private async Task HandleInvalidSubmit()
     {
-        // DataAnnotationsValidator and ValidationSummary will display errors automatically.
-        Console.WriteLine("Invalid submission.");
-        await Task.CompletedTask;
+        await _jsRuntime.InvokeVoidAsync("alert", "Please correct the errors in the form.");
     }
 }

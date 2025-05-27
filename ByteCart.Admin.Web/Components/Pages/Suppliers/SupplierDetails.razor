@@ -1,7 +1,7 @@
 @page "/suppliers/details/{SupplierId:guid}"
-@inject IMediator Mediator
-@inject NavigationManager NavManager
-@inject IJSRuntime JSRuntime
+@inject IMediator _mediator
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
 
 @rendermode InteractiveServer
 
@@ -56,43 +56,41 @@ else
             try
             {
                 var query = new GetSupplierByIdQueryCommand { Id = SupplierId };
-                supplier = await Mediator.Send(query);
+                supplier = await _mediator.Send(query);
             }
             catch (ApplicationException ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
-                await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
-                NavManager.NavigateTo("/suppliers", forceLoad: true); // Redirect if not found
+                await _jsRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+                _navigationManager.NavigateTo("/suppliers", forceLoad: true); 
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                await JSRuntime.InvokeVoidAsync("alert", $"An unexpected error occurred: {ex.Message}");
+                await _jsRuntime.InvokeVoidAsync("alert", $"An unexpected error occurred: {ex.Message}");
             }
         }
     }
 
     private async Task HandleDeleteSupplier()
     {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this supplier? This action cannot be undone.");
+        bool confirmed = await _jsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this supplier? This action cannot be undone.");
         if (confirmed)
         {
             try
             {
                 var DeleteSupplierCommand = new DeleteSupplierCommand { Id = SupplierId };
-                await Mediator.Send(DeleteSupplierCommand);
-                await JSRuntime.InvokeVoidAsync("alert", "Supplier deleted successfully!");
-                NavManager.NavigateTo("/suppliers"); // Redirect to list after deletion
+                await _mediator.Send(DeleteSupplierCommand);
+                await _jsRuntime.InvokeVoidAsync("alert", "Supplier deleted successfully!");
+                _navigationManager.NavigateTo("/suppliers"); 
             }
             catch (ApplicationException ex)
             {
                 // Business rule violation (e.g., supplier has products)
-                await JSRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+                await _jsRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error deleting supplier: {ex.Message}");
-                await JSRuntime.InvokeVoidAsync("alert", $"An unexpected error occurred during deletion: {ex.Message}");
+                await _jsRuntime.InvokeVoidAsync("alert", $"An unexpected error occurred during deletion: {ex.Message}");
             }
         }
     }
